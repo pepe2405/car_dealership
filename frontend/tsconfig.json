@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "types": ["vite/client", "@types/react"],
+    "allowSyntheticDefaultImports": true, // Often useful for libraries
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"], // Specifies that TypeScript should compile files in the src directory
+}
