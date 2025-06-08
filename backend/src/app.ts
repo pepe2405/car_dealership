@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { connectDB } from './config/database';
 import testRoutes from './routes/test';
-import authRoutes from './routes/auth';
+import authRoutes from './routes/user';
 import carRoutes from './routes/car';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
@@ -50,7 +50,7 @@ const swaggerOptions = {
       { url: 'http://localhost:5000/api' },
     ],
   },
-  apis: ['./src/routes/*.ts'], // adjust if your routes are in a different folder
+  apis: ['./src/routes/*.ts'],
 };
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

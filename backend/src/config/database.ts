@@ -20,7 +20,6 @@ export const connectDB = async (): Promise<void> => {
 
     console.log('Local MongoDB Connected Successfully!');
 
-    // Initialize database with required collections and data
     await initializeDatabase();
   } catch (err) {
     console.error('MongoDB connection error:', err);

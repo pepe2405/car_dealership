@@ -35,15 +35,17 @@ const App: React.FC = () => {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/register" element={<Register onRegister={handleRegister} />} />
-        {/* Protected route for selling a car */}
+        
+        {/* Protected route for selling a car - Seller role only */}
         <Route
           path="/sell"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={['seller', 'admin']}>
               <Sell />
             </ProtectedRoute>
           }
         />
+        
         {/* Protected routes */}
         <Route
           path="/dashboard"
@@ -61,6 +63,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

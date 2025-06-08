@@ -1,9 +1,18 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/cars';
+// Use relative URL to work with Vite proxy
+const API_URL = '/api/cars';
 
 // Configure axios defaults
 axios.defaults.withCredentials = true;
+
+// Create axios instance with default config
+const api = axios.create({
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export interface Car {
   _id: string;
@@ -29,26 +38,31 @@ export interface Car {
 }
 
 export async function fetchCars(): Promise<Car[]> {
-  const response = await axios.get(API_URL);
+  const response = await api.get(API_URL);
+  return response.data;
+}
+
+export async function fetchCarById(id: string): Promise<Car> {
+  const response = await api.get(`${API_URL}/${id}`);
   return response.data;
 }
 
 export async function fetchMyCars(token: string): Promise<Car[]> {
-  const response = await axios.get(`${API_URL}/mine`, {
+  const response = await api.get(`${API_URL}/mine`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 }
 
 export async function updateCar(id: string, data: Partial<Car>, token: string): Promise<Car> {
-  const response = await axios.put(`${API_URL}/${id}`, data, {
+  const response = await api.put(`${API_URL}/${id}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 }
 
 export async function deleteCar(id: string, token: string): Promise<void> {
-  await axios.delete(`${API_URL}/${id}`, {
+  await api.delete(`${API_URL}/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 } 

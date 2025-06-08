@@ -13,10 +13,9 @@ export const initializeDatabase = async (): Promise<void> => {
     let adminUser; 
 
     if (!adminExists) {
-      // Create admin user
       adminUser = new User({
         email: 'admin@example.com',
-        password: 'admin123', // This will be hashed by the pre-save hook
+        password: 'admin123',
         name: 'Admin User',
         role: 'admin',
       });
@@ -29,7 +28,6 @@ export const initializeDatabase = async (): Promise<void> => {
 
     const car = await Car.findOne({ brand: 'Toyota' });
     if (!car && adminUser) {
-      // Create a sample car
       console.log('Creating sample car');
       const mockCar = {
         brand: "Toyota",

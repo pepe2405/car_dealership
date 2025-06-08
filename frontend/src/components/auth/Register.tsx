@@ -12,13 +12,12 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     email: '',
     password: '',
     name: '',
-    role: 'buyer',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     setFormData({
       ...formData,
@@ -33,11 +32,12 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     setLoading(true);
 
     try {
+      // Register with default 'buyer' role
       await authService.register(
         formData.email,
         formData.password,
         formData.name,
-        formData.role
+        'buyer' // Default role
       );
       if (onRegister) onRegister();
       navigate('/');
@@ -60,6 +60,9 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
           </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Join as a buyer to start browsing cars
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
@@ -109,29 +112,12 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
                 name="password"
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
                 aria-invalid={!!error}
               />
-            </div>
-            <div>
-              <label htmlFor="role" className="sr-only">
-                Role
-              </label>
-              <select
-                id="role"
-                name="role"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                value={formData.role}
-                onChange={handleChange}
-                aria-invalid={!!error}
-              >
-                <option value="buyer">Buyer</option>
-                <option value="seller">Seller</option>
-              </select>
             </div>
           </div>
 

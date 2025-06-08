@@ -9,6 +9,8 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
   const navigate = useNavigate();
+  const currentUser = authService.getCurrentUser();
+  const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
 
   const handleLogout = () => {
     authService.logout();
@@ -31,12 +33,14 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
               >
                 Browse Cars
               </Link>
-              <Link
-                to="/sell"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
-              >
-                Sell Your Car
-              </Link>
+              {isSeller && (
+                <Link
+                  to="/sell"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
+                >
+                  Sell Your Car
+                </Link>
+              )}
               <Link
                 to="/about"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
