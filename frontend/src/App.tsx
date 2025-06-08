@@ -13,6 +13,7 @@ import authService from './services/authService';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
+import AdminCars from './pages/AdminCars';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,7 +42,7 @@ const App: React.FC = () => {
         <Route
           path="/sell"
           element={
-            <ProtectedRoute allowedRoles={['seller', 'admin']}>
+            <ProtectedRoute roles={['seller', 'admin']}>
               <Sell />
             </ProtectedRoute>
           }
@@ -69,8 +70,16 @@ const App: React.FC = () => {
         <Route
           path="/admin/users"
           element={
-            <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute roles={['admin']}>
               <AdminUsers />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/cars"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminCars />
             </ProtectedRoute>
           }
         />

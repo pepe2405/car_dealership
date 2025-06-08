@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { UserProfile } from './userService';
+import { Car } from './carService';
 
 const API_URL = '/api';
 
@@ -27,6 +28,37 @@ export const updateUser = async (token: string, userId: string, userData: Partia
 
 export const deleteUser = async (token: string, userId: string): Promise<void> => {
   await axios.delete(`${API_URL}/admin/users/${userId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+// Car management functions
+export const getAllCars = async (token: string): Promise<Car[]> => {
+  const response = await axios.get(`${API_URL}/admin/cars`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};
+
+export const updateCar = async (token: string, carId: string, carData: Partial<Car>): Promise<Car> => {
+  const response = await axios.put(
+    `${API_URL}/admin/cars/${carId}`,
+    carData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const deleteCar = async (token: string, carId: string): Promise<void> => {
+  await axios.delete(`${API_URL}/admin/cars/${carId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
