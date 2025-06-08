@@ -1,33 +1,71 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/auth/Login';
+import Register from './components/auth/Register';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Home from './pages/Home';
+import Cars from './pages/Cars';
+import CarDetails from './pages/CarDetails';
+import Sell from './pages/Sell';
+import About from './pages/About';
+import Navbar from './components/layout/Navbar';
+import authService from './services/authService';
+import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App: React.FC = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(!!authService.getCurrentUser());
+  }, []);
+
+  const handleLogin = () => setIsAuthenticated(true);
+  const handleRegister = () => setIsAuthenticated(true);
+  const handleLogout = () => setIsAuthenticated(false);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<Home />} />
+        <Route path="/cars" element={<Cars />} />
+        <Route path="/cars/:id" element={<CarDetails />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        <Route path="/register" element={<Register onRegister={handleRegister} />} />
+        {/* Protected route for selling a car */}
+        <Route
+          path="/sell"
+          element={
+            <ProtectedRoute>
+              <Sell />
+            </ProtectedRoute>
+          }
+        />
+        {/* Protected routes */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  );
+};
 
-export default App
+export default App;
