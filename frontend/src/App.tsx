@@ -12,6 +12,7 @@ import Navbar from './components/layout/Navbar';
 import authService from './services/authService';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import AdminUsers from './pages/AdminUsers';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -60,6 +61,16 @@ const App: React.FC = () => {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Admin routes */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminUsers />
             </ProtectedRoute>
           }
         />

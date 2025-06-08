@@ -6,6 +6,7 @@ import { connectDB } from './config/database';
 import testRoutes from './routes/test';
 import authRoutes from './routes/user';
 import carRoutes from './routes/car';
+import adminRoutes from './routes/admin';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
@@ -36,6 +37,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/test', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Swagger setup
 const swaggerOptions = {

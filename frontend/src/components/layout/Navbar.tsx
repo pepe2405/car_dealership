@@ -41,6 +41,14 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
                   Sell Your Car
                 </Link>
               )}
+              {currentUser?.role === 'admin' && (
+                <Link
+                  to="/admin/users"
+                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
+                >
+                  Manage Users
+                </Link>
+              )}
               <Link
                 to="/about"
                 className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
