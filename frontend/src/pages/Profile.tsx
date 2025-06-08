@@ -28,9 +28,6 @@ const Profile = () => {
           name: data.name,
           phone: data.phone || '',
           address: data.address || '',
-          city: data.city || '',
-          country: data.country || '',
-          bio: data.bio || '',
         });
       } catch (err: any) {
         setError('Failed to load profile');
@@ -224,40 +221,12 @@ const Profile = () => {
                       className="mt-1 input"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">City</label>
-                    <input
-                      name="city"
-                      value={form.city || ''}
-                      onChange={handleChange}
-                      className="mt-1 input"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Country</label>
-                    <input
-                      name="country"
-                      value={form.country || ''}
-                      onChange={handleChange}
-                      className="mt-1 input"
-                    />
-                  </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-gray-700">Address</label>
                     <input
                       name="address"
                       value={form.address || ''}
                       onChange={handleChange}
-                      className="mt-1 input"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Bio</label>
-                    <textarea
-                      name="bio"
-                      value={form.bio || ''}
-                      onChange={handleChange}
-                      rows={4}
                       className="mt-1 input"
                     />
                   </div>

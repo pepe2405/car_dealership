@@ -60,6 +60,22 @@ class AuthService {
     }
     return null;
   }
+
+  async changePassword(token: string, currentPassword: string, newPassword: string): Promise<void> {
+    const response = await axios.post(
+      `${API_URL}/auth/change-password`,
+      {
+        currentPassword,
+        newPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  }
 }
 
 export default new AuthService(); 
