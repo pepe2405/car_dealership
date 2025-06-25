@@ -15,7 +15,7 @@ export const initializeDatabase = async (): Promise<void> => {
     if (!adminExists) {
       adminUser = new User({
         email: 'admin@example.com',
-        password: 'admin123',
+        password: 'adminadmin',
         name: 'Admin User',
         role: 'admin',
       });

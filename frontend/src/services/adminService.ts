@@ -63,4 +63,13 @@ export const deleteCar = async (token: string, carId: string): Promise<void> => 
       Authorization: `Bearer ${token}`,
     },
   });
+};
+
+export const getAllUsersForChat = async (token: string): Promise<UserProfile[]> => {
+  const response = await axios.get(`/api/users-list`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 }; 

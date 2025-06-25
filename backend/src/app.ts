@@ -9,6 +9,10 @@ import carRoutes from './routes/car';
 import adminRoutes from './routes/admin';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import http from 'http';
+import { Server } from 'socket.io';
+import Message from './models/Message';
+import messagesRoutes from './routes/messages';
 
 // Initialize express app
 const app = express();
@@ -38,6 +42,7 @@ app.use('/api/test', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', messagesRoutes);
 
 // Swagger setup
 const swaggerOptions = {
@@ -70,9 +75,33 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Start server
+// Start server with socket.io
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
+    credentials: true,
+  },
+});
+
+// Socket.io logic
+io.on('connection', (socket) => {
+  // Очаква userId при join
+  socket.on('join', (userId) => {
+    socket.join(userId);
+  });
+
+  // Изпращане на съобщение
+  socket.on('send_message', async (data) => {
+    // data: { sender, receiver, content }
+    const message = await Message.create(data);
+    io.to(data.receiver).emit('receive_message', message);
+    io.to(data.sender).emit('receive_message', message); // за да се появи и при изпращача
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 

@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
 import AdminCars from './pages/AdminCars';
+import Messages from './pages/Messages';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -83,6 +84,9 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
+        {/* Messages route */}
+        <Route path="/messages" element={<Messages />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
