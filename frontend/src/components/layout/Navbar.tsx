@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import authService from '../../services/authService';
+import { FaCar, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaUserCircle, FaTachometerAlt, FaPlusCircle, FaUsers, FaClipboardList, FaInfoCircle, FaBars, FaComments } from 'react-icons/fa';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -11,6 +12,16 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
   const navigate = useNavigate();
   const currentUser = authService.getCurrentUser();
   const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const [menuPos, setMenuPos] = useState<{left: number, top: number} | null>(null);
+
+  useEffect(() => {
+    if (menuOpen && menuBtnRef.current) {
+      const rect = menuBtnRef.current.getBoundingClientRect();
+      setMenuPos({ left: rect.left, top: rect.bottom });
+    }
+  }, [menuOpen]);
 
   const handleLogout = () => {
     authService.logout();
@@ -19,91 +30,68 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
   };
 
   return (
-    <nav className="w-full bg-white shadow-md">
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold text-gray-800">AutoMarket</span>
-            </Link>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                to="/cars"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900"
-              >
-                Browse Cars
-              </Link>
+    <nav className="w-full sticky top-0 z-50 bg-primary-900 shadow-2xl backdrop-blur-md">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div className="flex items-center gap-3 relative">
+          <Link to="/" className="flex items-center gap-2">
+            <FaCar className="text-3xl text-primary-200 drop-shadow" />
+            <span className="text-2xl font-extrabold text-white tracking-wide">AutoMarket</span>
+          </Link>
+          <button
+            ref={menuBtnRef}
+            className="ml-4 flex items-center gap-2 px-3 py-1 rounded-full border border-primary-700 bg-primary-700 text-white font-bold text-sm shadow hover:bg-primary-900 hover:text-yellow-300 transition-all focus:outline-none"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <FaBars className="text-lg" /> Меню
+          </button>
+          {menuOpen && menuPos && (
+            <div
+              className="fixed z-50 min-w-[180px] bg-white rounded-2xl shadow-2xl border border-primary-100 py-2 flex flex-col gap-1 animate-fade-in"
+              style={{ left: menuPos.left, top: menuPos.top + 4 }}
+            >
+              <Link to="/cars" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaClipboardList className="text-base" /> Обяви</Link>
               {isSeller && (
-                <Link
-                  to="/sell"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  Sell Your Car
-                </Link>
+                <Link to="/sell" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaPlusCircle className="text-base" /> Публикувай</Link>
+              )}
+              {isAuthenticated && (
+                <Link to="/messages" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaComments className="text-base" /> Съобщения</Link>
               )}
               {currentUser?.role === 'admin' && (
-                <Link
-                  to="/admin/users"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  Manage Users
-                </Link>
+                <Link to="/admin/users" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaUsers className="text-base" /> Потребители</Link>
               )}
               {currentUser?.role === 'admin' && (
-                <Link
-                  to="/admin/cars"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
-                >
-                  Manage Cars
-                </Link>
+                <Link to="/admin/cars" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCar className="text-base" /> Админ коли</Link>
               )}
-              <Link
-                to="/about"
-                className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-900"
-              >
-                About
-              </Link>
+              <Link to="/about" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaInfoCircle className="text-base" /> За нас</Link>
             </div>
-          </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/profile"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-500 hover:bg-blue-600 mr-2"
-                >
-                  Profile
-                </Link>
-                <Link
-                  to="/dashboard"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 mr-2"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="ml-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
+          )}
+        </div>
+        <div className="flex gap-2 mt-2 sm:mt-0">
+          {isAuthenticated ? (
+            <>
+              <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-primary-700 bg-primary-800 text-yellow-300 font-bold shadow hover:bg-yellow-400 hover:text-primary-900 hover:border-yellow-400 transition-all">
+                <FaUserCircle className="text-lg" /> Профил
+              </Link>
+              <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-yellow-400 bg-yellow-400 text-primary-900 font-bold shadow hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all">
+                <FaTachometerAlt className="text-lg" /> Табло
+              </Link>
+              <Link to="/messages" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-primary-700 bg-primary-700 text-white font-bold shadow hover:bg-primary-900 hover:text-yellow-300 transition-all">
+                <FaComments className="text-lg" /> Съобщения
+              </Link>
+              <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-red-600 bg-red-600 text-white font-bold shadow hover:bg-white hover:text-red-600 hover:border-white transition-all">
+                <FaSignOutAlt className="text-lg" /> Изход
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-primary-700 bg-primary-800 text-yellow-300 font-bold shadow hover:bg-yellow-400 hover:text-primary-900 hover:border-yellow-400 transition-all">
+                <FaSignInAlt className="text-lg" /> Вход
+              </Link>
+              <Link to="/register" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-yellow-400 bg-yellow-400 text-primary-900 font-bold shadow hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all">
+                <FaUserPlus className="text-lg" /> Регистрация
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

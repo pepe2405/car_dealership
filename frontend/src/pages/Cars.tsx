@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchCars, Car } from '../services/carService';
+import { FaCar, FaSearch, FaFilter, FaDollarSign, FaCalendarAlt, FaGasPump, FaCogs } from 'react-icons/fa';
 
 const Cars = () => {
   const [cars, setCars] = useState<Car[]>([]);
@@ -133,26 +134,27 @@ const Cars = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-primary-100">
       <div className="w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="animate-fade-in">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Browse Cars</h1>
-          <p className="text-lg text-gray-600 mb-8">Find your perfect match from our extensive collection</p>
+        <div className="animate-fade-in flex items-center gap-4 mb-8">
+          <FaCar className="text-4xl text-primary-500 drop-shadow" />
+          <h1 className="text-4xl font-bold text-primary-700 mb-2">Browse Cars</h1>
         </div>
+        <p className="text-lg text-primary-700 mb-8">Find your perfect match from our extensive collection</p>
         
         {/* Search and Filters */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 animate-slide-up">
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 animate-slide-up border border-primary-100">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Brand and Model Selection */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Brand</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Brand</label>
               <select
                 value={selectedBrand}
                 onChange={(e) => {
                   setSelectedBrand(e.target.value);
                   setSelectedModel('');
                 }}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
                 <option value="">All Brands</option>
                 {uniqueBrands.map(brand => (
@@ -162,11 +164,11 @@ const Cars = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Model</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Model</label>
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
                 disabled={!selectedBrand}
               >
                 <option value="">All Models</option>
@@ -178,52 +180,50 @@ const Cars = () => {
 
             {/* Additional Search */}
             <div className="lg:col-span-2 space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Search Description & Features</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaSearch className="text-primary-400" />Search Description & Features</label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Search in description and features..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="input pl-10"
+                  className="input pl-10 rounded-xl border-primary-200 focus:border-primary-500"
                 />
-                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-primary-300" />
               </div>
             </div>
 
             {/* Price Range */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Min Price ($)</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaDollarSign className="text-primary-400" />Min Price ($)</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">$</span>
                 <input
                   type="number"
                   name="minPrice"
                   value={filters.minPrice}
                   onChange={handleFilterChange}
-                  className="input pl-8"
+                  className="input pl-8 rounded-xl border-primary-200 focus:border-primary-500"
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Max Price ($)</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaDollarSign className="text-primary-400" />Max Price ($)</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">$</span>
                 <input
                   type="number"
                   name="maxPrice"
                   value={filters.maxPrice}
                   onChange={handleFilterChange}
-                  className="input pl-8"
+                  className="input pl-8 rounded-xl border-primary-200 focus:border-primary-500"
                 />
               </div>
             </div>
 
             {/* Year Range */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Min Year</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCalendarAlt className="text-primary-400" />Min Year</label>
               <input
                 type="number"
                 name="minYear"
@@ -231,11 +231,11 @@ const Cars = () => {
                 onChange={handleFilterChange}
                 min="1900"
                 max={new Date().getFullYear()}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Max Year</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCalendarAlt className="text-primary-400" />Max Year</label>
               <input
                 type="number"
                 name="maxYear"
@@ -243,18 +243,18 @@ const Cars = () => {
                 onChange={handleFilterChange}
                 min="1900"
                 max={new Date().getFullYear()}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
               />
             </div>
 
             {/* Fuel Type */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Fuel Type</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaGasPump className="text-primary-400" />Fuel Type</label>
               <select
                 name="fuelType"
                 value={filters.fuelType}
                 onChange={handleFilterChange}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
                 <option value="">All</option>
                 <option value="petrol">Petrol</option>
@@ -266,45 +266,44 @@ const Cars = () => {
 
             {/* Transmission */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Transmission</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCogs className="text-primary-400" />Transmission</label>
               <select
                 name="transmission"
                 value={filters.transmission}
                 onChange={handleFilterChange}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
                 <option value="">All</option>
-                <option value="automatic">Automatic</option>
                 <option value="manual">Manual</option>
+                <option value="automatic">Automatic</option>
               </select>
             </div>
 
             {/* Sort By */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">Sort By</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Sort By</label>
               <select
                 name="sortBy"
                 value={filters.sortBy}
                 onChange={handleFilterChange}
-                className="input"
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
-                <option value="newest">Newest First</option>
+                <option value="newest">Newest</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
-                <option value="year-desc">Year: Newest First</option>
-                <option value="year-asc">Year: Oldest First</option>
+                <option value="year-desc">Year: New to Old</option>
+                <option value="year-asc">Year: Old to New</option>
               </select>
             </div>
-
-            {/* Clear Filters */}
-            <div className="flex items-end">
-              <button
-                onClick={clearFilters}
-                className="btn-secondary w-full"
-              >
-                Clear Filters
-              </button>
-            </div>
+          </div>
+          <div className="flex justify-between mt-6">
+            <button
+              className="btn-secondary px-6 py-2 rounded-xl text-primary-700 border border-primary-200 hover:bg-primary-100 transition-all"
+              onClick={clearFilters}
+              type="button"
+            >
+              Clear Filters
+            </button>
           </div>
         </div>
 
@@ -318,40 +317,38 @@ const Cars = () => {
             <p className="text-red-600">{error}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredCars.map(car => (
-              <div key={car.id} className="card group hover:shadow-xl transition-all duration-300">
-                <div className="relative h-48 overflow-hidden rounded-t-xl">
-                  <img
-                    src={car.imageUrl}
-                    alt={`${car.brand} ${car.carModel}`}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-500 text-white">
-                      {car.year}
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900">{car.brand} {car.carModel}</h3>
-                  <p className="mt-2 text-gray-600">{car.fuelType} • {car.transmission}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-2xl font-bold text-primary-600">${car.price.toLocaleString()}</span>
-                    <Link to={`/cars/${car._id}`} className="btn-primary text-sm">
-                      View Details
-                    </Link>
-                  </div>
-                </div>
+          <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredCars.length === 0 ? (
+              <div className="col-span-full text-center text-primary-600 text-xl font-semibold py-12 animate-fade-in">
+                No cars found matching your criteria.
               </div>
-            ))}
-          </div>
-        )}
-
-        {!loading && !error && filteredCars.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-600">No cars found matching your criteria.</p>
+            ) : (
+              filteredCars.map(car => (
+                <div key={car.id} className="card group hover:shadow-2xl transition-all duration-300 bg-white rounded-2xl overflow-hidden border border-primary-100 animate-fade-in">
+                  <div className="relative h-56 overflow-hidden rounded-t-2xl">
+                    <img
+                      src={car.images[0] || 'https://via.placeholder.com/400x200?text=No+Image'}
+                      alt={car.brand + ' ' + car.carModel}
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-500 text-white shadow">
+                        {car.brand}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-primary-700">{car.brand} {car.carModel}</h3>
+                    <p className="mt-2 text-gray-600">{car.year} • {car.fuelType} • {car.transmission}</p>
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-2xl font-bold text-primary-600">${car.price.toLocaleString()}</span>
+                      <Link to={`/cars/${car.id}`} className="btn-primary text-sm rounded-xl px-4 py-2">View Details</Link>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
