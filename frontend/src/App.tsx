@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
 import AdminCars from './pages/AdminCars';
 import Messages from './pages/Messages';
+import Favorites from './pages/Favorites';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -87,6 +88,16 @@ const App: React.FC = () => {
         
         {/* Messages route */}
         <Route path="/messages" element={<Messages />} />
+        
+        {/* Favorites route */}
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <Favorites />
+            </ProtectedRoute>
+          }
+        />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

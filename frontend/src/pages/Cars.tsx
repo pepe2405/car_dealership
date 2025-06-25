@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchCars, Car } from '../services/carService';
-import { FaCar, FaSearch, FaFilter, FaDollarSign, FaCalendarAlt, FaGasPump, FaCogs } from 'react-icons/fa';
+import { FaCar, FaSearch, FaFilter, FaDollarSign, FaCalendarAlt, FaGasPump, FaCogs, FaHeart, FaRegHeart } from 'react-icons/fa';
+import authService from '../services/authService';
+import { addFavorite, removeFavorite, fetchFavorites } from '../services/carService';
 
 const Cars = () => {
   const [cars, setCars] = useState<Car[]>([]);
@@ -22,6 +24,9 @@ const Cars = () => {
     transmission: '',
     sortBy: 'newest',
   });
+
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favError, setFavError] = useState('');
 
   // Get unique brands and models
   const uniqueBrands = [...new Set(cars.map(car => car.brand))].sort();
@@ -113,6 +118,17 @@ const Cars = () => {
     setFilteredCars(result);
   }, [cars, searchTerm, selectedBrand, selectedModel, filters]);
 
+  useEffect(() => {
+    const token = authService.getToken();
+    if (token) {
+      fetchFavorites(token)
+        .then(favs => setFavorites(favs.map(car => car._id)))
+        .catch(() => setFavorites([]));
+    } else {
+      setFavorites([]);
+    }
+  }, [authService.getToken()]);
+
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
@@ -131,6 +147,26 @@ const Cars = () => {
       transmission: '',
       sortBy: 'newest',
     });
+  };
+
+  const handleFavorite = async (carId: string) => {
+    const token = authService.getToken();
+    if (!token) {
+      setFavError('Трябва да сте влезли, за да добавяте в любими.');
+      return;
+    }
+    try {
+      if (favorites.includes(carId)) {
+        await removeFavorite(carId, token);
+        setFavorites(favorites.filter(id => id !== carId));
+      } else {
+        await addFavorite(carId, token);
+        setFavorites([...favorites, carId]);
+      }
+      setFavError('');
+    } catch (e) {
+      setFavError('Грешка при добавяне/премахване от любими.');
+    }
   };
 
   return (
@@ -324,7 +360,7 @@ const Cars = () => {
               </div>
             ) : (
               filteredCars.map(car => (
-                <div key={car.id} className="card group hover:shadow-2xl transition-all duration-300 bg-white rounded-2xl overflow-hidden border border-primary-100 animate-fade-in">
+                <div key={car._id} className="card relative group hover:shadow-2xl transition-all duration-300 bg-white rounded-2xl overflow-hidden border border-primary-100 animate-fade-in">
                   <div className="relative h-56 overflow-hidden rounded-t-2xl">
                     <img
                       src={car.images[0] || 'https://via.placeholder.com/400x200?text=No+Image'}
@@ -343,14 +379,25 @@ const Cars = () => {
                     <p className="mt-2 text-gray-600">{car.year} • {car.fuelType} • {car.transmission}</p>
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-2xl font-bold text-primary-600">${car.price.toLocaleString()}</span>
-                      <Link to={`/cars/${car.id}`} className="btn-primary text-sm rounded-xl px-4 py-2">View Details</Link>
+                      <Link to={`/cars/${car._id}`} className="btn-primary text-sm rounded-xl px-4 py-2">View Details</Link>
                     </div>
+                  </div>
+                  <div className="absolute top-4 right-4 z-10">
+                    <button onClick={() => handleFavorite(car._id)} className="focus:outline-none">
+                      {favorites.includes(car._id) ? (
+                        <FaHeart className="text-red-500 text-2xl drop-shadow animate-pulse" />
+                      ) : (
+                        <FaRegHeart className="text-gray-300 text-2xl hover:text-red-400 transition-colors" />
+                      )}
+                    </button>
                   </div>
                 </div>
               ))
             )}
           </div>
         )}
+
+        {favError && <div className="text-red-600 text-center mb-4 animate-fade-in">{favError}</div>}
       </div>
     </div>
   );

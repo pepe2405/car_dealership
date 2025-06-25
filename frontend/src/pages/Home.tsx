@@ -2,27 +2,6 @@ import { Link } from 'react-router-dom';
 import authService from '../services/authService';
 import { FaCar, FaSearch, FaMoneyCheckAlt, FaUserCheck, FaQuoteLeft, FaStar } from 'react-icons/fa';
 
-const testimonials = [
-  {
-    name: 'Иван Петров',
-    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-    text: 'Намерих мечтаната си кола за 2 дни! Интерфейсът е супер лесен и красив.',
-    rating: 5,
-  },
-  {
-    name: 'Мария Георгиева',
-    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-    text: 'Продадох автомобила си за по-малко от седмица. Препоръчвам на всички!',
-    rating: 5,
-  },
-  {
-    name: 'Георги Стоянов',
-    avatar: 'https://randomuser.me/api/portraits/men/65.jpg',
-    text: 'Чатът с продавачите е много удобен, а дизайнът е уникален!',
-    rating: 4,
-  },
-];
-
 const Home = () => {
   const currentUser = authService.getCurrentUser();
   const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
@@ -37,34 +16,10 @@ const Home = () => {
           <FaCar className="text-7xl text-yellow-300 drop-shadow-xl animate-bounce" />
           <h1 className="text-5xl md:text-7xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-white to-primary-200 drop-shadow-2xl">AutoMarket</h1>
           <p className="text-2xl md:text-3xl text-white font-semibold drop-shadow-lg">Твоят нов автомобил е на един клик разстояние</p>
-          <div className="w-full flex flex-col md:flex-row items-center gap-4 mt-6">
-            <input type="text" placeholder="Търси марка, модел или ключова дума..." className="w-full md:flex-1 px-6 py-4 rounded-2xl text-lg shadow-lg focus:ring-4 focus:ring-yellow-300 outline-none" />
+          <div className="w-full flex justify-center mt-6">
             <Link to="/cars" className="flex items-center gap-2 px-8 py-4 rounded-2xl bg-yellow-400 text-primary-900 font-bold text-xl shadow-xl hover:bg-yellow-300 transition-all">
               <FaSearch /> Търси
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Cars Section */}
-      <section className="w-full py-20 px-2 md:px-0">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-extrabold text-primary-800 mb-10 text-left pl-2">Топ оферти</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {/* Example Featured Car Card */}
-            <div className="relative group rounded-3xl overflow-hidden shadow-2xl border-4 border-yellow-200 bg-white hover:scale-105 transition-transform">
-              <img src="https://images.unsplash.com/photo-1583121274602-3e2820c69888?ixlib=rb-4.0.3" alt="Car" className="w-full h-60 object-cover group-hover:scale-110 transition-transform duration-300" />
-              <div className="absolute top-4 left-4 bg-yellow-400 text-primary-900 px-4 py-2 rounded-full font-bold shadow-lg">Промо</div>
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary-900/80 to-transparent p-6">
-                <h3 className="text-2xl font-bold text-white">2023 Tesla Model S</h3>
-                <p className="text-lg text-yellow-200 mt-2">Електрическа • Автоматик • 396 км пробег</p>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-3xl font-extrabold text-yellow-400 drop-shadow">$89,990</span>
-                  <button className="btn-primary text-lg rounded-xl px-6 py-2 bg-yellow-400 text-primary-900 font-bold shadow hover:bg-yellow-300">Виж</button>
-                </div>
-              </div>
-            </div>
-            {/* Add more featured car cards here */}
           </div>
         </div>
       </section>

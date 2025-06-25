@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Car, fetchCarById } from '../services/carService';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import authService from '../services/authService';
+import { addFavorite, removeFavorite, fetchFavorites } from '../services/carService';
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -9,6 +12,9 @@ const CarDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [mainImageIdx, setMainImageIdx] = useState(0);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [favError, setFavError] = useState('');
+  const currentUser = authService.getCurrentUser();
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -40,6 +46,35 @@ const CarDetails = () => {
     };
     fetchCar();
   }, [id, navigate]);
+
+  useEffect(() => {
+    if (currentUser && currentUser.token) {
+      fetchFavorites(currentUser.token)
+        .then(favs => setFavorites(favs.map(car => car._id)))
+        .catch(() => setFavorites([]));
+    } else {
+      setFavorites([]);
+    }
+  }, [currentUser]);
+
+  const handleFavorite = async (carId: string) => {
+    if (!currentUser) {
+      setFavError('Трябва да сте влезли, за да добавите в любими.');
+      return;
+    }
+    try {
+      if (favorites.includes(carId)) {
+        await removeFavorite(carId, currentUser.token);
+        setFavorites(favorites.filter(id => id !== carId));
+      } else {
+        await addFavorite(carId, currentUser.token);
+        setFavorites([...favorites, carId]);
+      }
+      setFavError('');
+    } catch (e) {
+      setFavError('Грешка при добавяне/премахване от любими.');
+    }
+  };
 
   if (loading) {
     return (
@@ -102,7 +137,18 @@ const CarDetails = () => {
         <Link to="/cars" className="text-primary-600 hover:text-primary-700">&larr; Back to Cars</Link>
         <div className="bg-white rounded-lg shadow-md p-6 mt-4">
           {/* Image Gallery */}
-          <div className="mb-6">
+          <div className="mb-6 relative">
+            {car && (
+              <div className="absolute top-4 right-4 z-10">
+                <button onClick={() => handleFavorite(car._id)} className="focus:outline-none">
+                  {favorites.includes(car._id) ? (
+                    <FaHeart className="text-red-500 text-3xl drop-shadow animate-pulse" />
+                  ) : (
+                    <FaRegHeart className="text-gray-300 text-3xl hover:text-red-400 transition-colors" />
+                  )}
+                </button>
+              </div>
+            )}
             <img
               src={images[mainImageIdx]}
               alt={car.brand + ' ' + car.carModel}
@@ -189,6 +235,7 @@ const CarDetails = () => {
               </p>
             </div>
           </div>
+          {favError && <div className="text-red-600 text-center mb-4 animate-fade-in">{favError}</div>}
         </div>
       </div>
     </div>
