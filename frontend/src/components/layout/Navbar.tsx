@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import authService from '../../services/authService';
-import { FaCar, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaUserCircle, FaTachometerAlt, FaPlusCircle, FaUsers, FaClipboardList, FaInfoCircle, FaBars, FaComments, FaHeart } from 'react-icons/fa';
+import { FaCar, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaUserCircle, FaTachometerAlt, FaPlusCircle, FaUsers, FaClipboardList, FaInfoCircle, FaBars, FaComments, FaHeart, FaCheckCircle } from 'react-icons/fa';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -52,6 +52,9 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
               <Link to="/cars" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaClipboardList className="text-base" /> Обяви</Link>
               {isSeller && (
                 <Link to="/sell" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaPlusCircle className="text-base" /> Публикувай</Link>
+              )}
+              {isSeller && (
+                <Link to="/test-drives" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCheckCircle className="text-base text-green-600" /> Тест драйв заявки</Link>
               )}
               {isAuthenticated && (
                 <Link to="/messages" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaComments className="text-base" /> Съобщения</Link>

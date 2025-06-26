@@ -13,6 +13,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import Message from './models/Message';
 import messagesRoutes from './routes/messages';
+import testDriveRoutes from './routes/testDrive';
 
 // Initialize express app
 const app = express();
@@ -43,6 +44,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api', messagesRoutes);
+app.use('/api/test-drives', testDriveRoutes);
 
 // Swagger setup
 const swaggerOptions = {

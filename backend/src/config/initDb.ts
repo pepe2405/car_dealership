@@ -38,8 +38,8 @@ export const initializeDatabase = async (): Promise<void> => {
         fuelType: "petrol",
         transmission: "automatic",
         images: [
-          "https://example.com/car1.jpg",
-          "https://example.com/car2.jpg"
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/2019_Toyota_Corolla_Icon_Tech_VVT-i_Hybrid_1.8.jpg/960px-2019_Toyota_Corolla_Icon_Tech_VVT-i_Hybrid_1.8.jpg",
+          "https://c8.alamy.com/comp/2J2W6T2/2019-red-toyota-corolla-vvt-1-excel-hev-c-driving-on-the-m61-motorway-manchester-uk-2J2W6T2.jpg"
         ],
         description: "A reliable and fuel-efficient sedan, perfect for city driving.",
         features: ["Bluetooth", "Backup Camera", "Cruise Control"],

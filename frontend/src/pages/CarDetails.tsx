@@ -4,6 +4,7 @@ import { Car, fetchCarById } from '../services/carService';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import authService from '../services/authService';
 import { addFavorite, removeFavorite, fetchFavorites } from '../services/carService';
+import { createTestDriveRequest, getTestDriveRequestForCar, deleteTestDriveRequest } from '../services/testDriveService';
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -15,6 +16,12 @@ const CarDetails = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favError, setFavError] = useState('');
   const currentUser = authService.getCurrentUser();
+  const [showTestDriveModal, setShowTestDriveModal] = useState(false);
+  const [testDriveDate, setTestDriveDate] = useState('');
+  const [testDriveMsg, setTestDriveMsg] = useState('');
+  const [testDriveError, setTestDriveError] = useState('');
+  const [testDriveSuccess, setTestDriveSuccess] = useState('');
+  const [myTestDrive, setMyTestDrive] = useState<any>(null);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -48,14 +55,26 @@ const CarDetails = () => {
   }, [id, navigate]);
 
   useEffect(() => {
-    if (currentUser && currentUser.token) {
-      fetchFavorites(currentUser.token)
+    const token = authService.getToken();
+    if (currentUser && token) {
+      fetchFavorites(token)
         .then(favs => setFavorites(favs.map(car => car._id)))
         .catch(() => setFavorites([]));
     } else {
       setFavorites([]);
     }
-  }, [currentUser]);
+  }, [authService.getToken()]);
+
+  useEffect(() => {
+    const fetchMyTestDrive = async () => {
+      if (!car || !currentUser) return;
+      const token = authService.getToken();
+      if (!token) return;
+      const req = await getTestDriveRequestForCar(car._id, token);
+      setMyTestDrive(req);
+    };
+    fetchMyTestDrive();
+  }, [car, currentUser]);
 
   const handleFavorite = async (carId: string) => {
     if (!currentUser) {
@@ -63,16 +82,48 @@ const CarDetails = () => {
       return;
     }
     try {
+      const token = authService.getToken();
+      if (!token) {
+        setFavError('Трябва да сте влезли, за да добавите в любими.');
+        return;
+      }
       if (favorites.includes(carId)) {
-        await removeFavorite(carId, currentUser.token);
+        await removeFavorite(carId, token);
         setFavorites(favorites.filter(id => id !== carId));
       } else {
-        await addFavorite(carId, currentUser.token);
+        await addFavorite(carId, token);
         setFavorites([...favorites, carId]);
       }
       setFavError('');
     } catch (e) {
       setFavError('Грешка при добавяне/премахване от любими.');
+    }
+  };
+
+  const handleTestDriveRequest = async () => {
+    setTestDriveError(''); setTestDriveSuccess('');
+    const token = authService.getToken();
+    if (!token) { setTestDriveError('Трябва да сте влезли.'); return; }
+    if (!testDriveDate) { setTestDriveError('Изберете дата и час.'); return; }
+    try {
+      const newReq = await createTestDriveRequest({ car: car!._id, date: testDriveDate, message: testDriveMsg }, token);
+      setMyTestDrive(newReq);
+      setTestDriveSuccess('Заявката е изпратена!');
+      setShowTestDriveModal(false);
+    } catch (e) {
+      setTestDriveError('Грешка при заявката.');
+    }
+  };
+
+  const handleCancelTestDrive = async () => {
+    if (!myTestDrive) return;
+    const token = authService.getToken();
+    if (!token) return;
+    try {
+      await deleteTestDriveRequest(myTestDrive._id, token);
+      setMyTestDrive(null);
+    } catch (e) {
+      setTestDriveError('Грешка при отказ на заявката.');
     }
   };
 
@@ -236,6 +287,55 @@ const CarDetails = () => {
             </div>
           </div>
           {favError && <div className="text-red-600 text-center mb-4 animate-fade-in">{favError}</div>}
+          {myTestDrive ? (
+            <div className="mt-8 flex flex-col items-center justify-center gap-2">
+              <div className={`px-4 py-2 rounded-xl text-lg font-bold shadow ${myTestDrive.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : myTestDrive.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                Заявка за тест драйв: {myTestDrive.status === 'pending' ? 'Изчаква' : myTestDrive.status === 'approved' ? 'Одобрена' : 'Отказана'}
+              </div>
+              <div className="text-gray-700">Дата: {new Date(myTestDrive.date).toLocaleString('bg')}</div>
+              {myTestDrive.message && <div className="text-gray-600 italic">"{myTestDrive.message}"</div>}
+              {myTestDrive.status === 'pending' && (
+                <button
+                  className="btn-secondary mt-4 px-6 py-2 rounded-xl text-base font-bold shadow hover:bg-red-200 transition-all"
+                  onClick={handleCancelTestDrive}
+                >
+                  Откажи заявката
+                </button>
+              )}
+              {(myTestDrive.status === 'approved' || myTestDrive.status === 'rejected') && (
+                <button
+                  className="btn-primary mt-4 px-6 py-2 rounded-xl text-base font-bold shadow hover:bg-primary-700 transition-all"
+                  onClick={() => setShowTestDriveModal(true)}
+                >
+                  Нова заявка
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="mt-8 flex justify-center">
+              <button
+                className="btn-primary px-8 py-3 rounded-xl text-lg font-bold shadow-lg hover:bg-primary-700 transition-all"
+                onClick={() => setShowTestDriveModal(true)}
+              >
+                Заяви тест драйв
+              </button>
+            </div>
+          )}
+          {showTestDriveModal && (
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md relative">
+                <button className="absolute top-2 right-4 text-2xl text-gray-400 hover:text-gray-700" onClick={() => setShowTestDriveModal(false)}>&times;</button>
+                <h2 className="text-2xl font-bold mb-4 text-center">Заяви тест драйв</h2>
+                {testDriveError && <div className="text-red-600 mb-2 text-center">{testDriveError}</div>}
+                {testDriveSuccess && <div className="text-green-600 mb-2 text-center">{testDriveSuccess}</div>}
+                <label className="block mb-2 font-medium">Дата и час</label>
+                <input type="datetime-local" className="input w-full mb-4" value={testDriveDate} onChange={e => setTestDriveDate(e.target.value)} />
+                <label className="block mb-2 font-medium">Съобщение (по избор)</label>
+                <textarea className="input w-full mb-4" value={testDriveMsg} onChange={e => setTestDriveMsg(e.target.value)} />
+                <button className="btn-primary w-full py-2 rounded-xl font-bold" onClick={handleTestDriveRequest}>Изпрати заявка</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

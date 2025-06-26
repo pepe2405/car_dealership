@@ -16,6 +16,7 @@ import AdminUsers from './pages/AdminUsers';
 import AdminCars from './pages/AdminCars';
 import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
+import TestDrives from './pages/TestDrives';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -98,6 +99,9 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
+        {/* Test Drives route */}
+        <Route path="/test-drives" element={<TestDrives />} />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />
