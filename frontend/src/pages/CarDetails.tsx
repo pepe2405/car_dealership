@@ -8,6 +8,8 @@ import { createTestDriveRequest, getTestDriveRequestForCar, deleteTestDriveReque
 import { checkDepositStatus, DepositStatusResponse } from '../services/depositsService';
 import DepositModal from '../components/DepositModal';
 import DepositStatus from '../components/DepositStatus';
+import DirectSaleModal from '../components/DirectSaleModal';
+import PurchaseModal from '../components/PurchaseModal';
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -34,6 +36,12 @@ const CarDetails = () => {
   const [depositLoading, setDepositLoading] = useState(false);
   const isFetchingDeposit = useRef(false);
   const isFetchingTestDrive = useRef(false);
+
+  // Direct sale related state
+  const [showDirectSaleModal, setShowDirectSaleModal] = useState(false);
+
+  // Purchase related state
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -201,6 +209,16 @@ const CarDetails = () => {
           });
       }
     }
+  };
+
+  const handleSaleCreated = () => {
+    // Redirect to profile page after successful sale
+    navigate('/profile');
+  };
+
+  const handlePurchaseCreated = () => {
+    // Redirect to profile page after successful purchase
+    navigate('/profile');
   };
 
   if (loading) {
@@ -397,6 +415,54 @@ const CarDetails = () => {
             </div>
           )}
 
+          {/* Purchase Section - Only for buyers */}
+          {currentUser && isBuyer && car.status === 'available' && (
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <h2 className="text-lg font-semibold mb-4">Покупка</h2>
+              <div className="bg-green-50 rounded-lg p-6 text-center">
+                <div className="mb-4">
+                  <svg className="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-green-900 mb-2">Купете автомобила директно</h3>
+                <p className="text-green-700 mb-4">
+                  Направете покупка на автомобила с пълна цена или лизинг.
+                </p>
+                <button
+                  onClick={() => setShowPurchaseModal(true)}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  Направи покупка
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Direct Sale Section - Only for sellers and admins */}
+          {currentUser && isSeller && car.status === 'available' && (
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <h2 className="text-lg font-semibold mb-4">Директна продажба</h2>
+              <div className="bg-blue-50 rounded-lg p-6 text-center">
+                <div className="mb-4">
+                  <svg className="mx-auto h-12 w-12 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-blue-900 mb-2">Продайте автомобила директно</h3>
+                <p className="text-blue-700 mb-4">
+                  Създайте продажба и генерирайте фактура за купувач.
+                </p>
+                <button
+                  onClick={() => setShowDirectSaleModal(true)}
+                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Директна продажба
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Test Drive Section */}
           {currentUser && isBuyer && (
             <>
@@ -462,6 +528,34 @@ const CarDetails = () => {
               carId={car._id}
               carPrice={car.price}
               onDepositCreated={handleDepositCreated}
+            />
+          )}
+
+          {/* Direct Sale Modal */}
+          {showDirectSaleModal && car && (
+            <DirectSaleModal
+              isOpen={showDirectSaleModal}
+              onClose={() => setShowDirectSaleModal(false)}
+              carId={car._id}
+              carPrice={car.price}
+              carBrand={car.brand}
+              carModel={car.carModel}
+              carYear={car.year}
+              onSaleCreated={handleSaleCreated}
+            />
+          )}
+
+          {/* Purchase Modal */}
+          {showPurchaseModal && car && (
+            <PurchaseModal
+              isOpen={showPurchaseModal}
+              onClose={() => setShowPurchaseModal(false)}
+              carId={car._id}
+              carPrice={car.price}
+              carBrand={car.brand}
+              carModel={car.carModel}
+              carYear={car.year}
+              onPurchaseCreated={handlePurchaseCreated}
             />
           )}
         </div>

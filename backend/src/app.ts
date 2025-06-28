@@ -17,6 +17,7 @@ import testDriveRoutes from './routes/testDrive';
 import forumRoutes from './routes/forum';
 import leaseOptionsRoutes from './routes/leaseOptions';
 import depositsRoutes from './routes/deposits';
+import salesRoutes from './routes/sales';
 
 // Initialize express app
 const app = express();
@@ -51,6 +52,7 @@ app.use('/api/test-drives', testDriveRoutes);
 app.use('/api/forums', forumRoutes);
 app.use('/api/lease-options', leaseOptionsRoutes);
 app.use('/api/deposits', depositsRoutes);
+app.use('/api/sales', salesRoutes);
 
 // Swagger setup
 const swaggerOptions = {
