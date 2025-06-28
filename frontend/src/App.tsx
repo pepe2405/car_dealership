@@ -14,12 +14,16 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
 import AdminCars from './pages/AdminCars';
+import AdminCarsView from './pages/AdminCarsView';
+import AdminDeposits from './pages/AdminDeposits';
+import OwnerDeposits from './pages/OwnerDeposits';
 import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
 import TestDrives from './pages/TestDrives';
 import Forums from './pages/Forums';
 import ForumDetail from './components/forum/ForumDetail';
 import Leasing from './pages/Leasing';
+import Deposits from './pages/Deposits';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,7 +55,7 @@ const App: React.FC = () => {
         <Route
           path="/sell"
           element={
-            <ProtectedRoute roles={['seller', 'admin']}>
+            <ProtectedRoute roles={['seller']}>
               <Sell />
             </ProtectedRoute>
           }
@@ -92,15 +96,31 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin/cars-view"
+          element={
+            <ProtectedRoute roles={['admin', 'seller']}>
+              <AdminCarsView />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/deposits"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminDeposits />
+            </ProtectedRoute>
+          }
+        />
         
         {/* Messages route */}
         <Route path="/messages" element={<Messages />} />
         
-        {/* Favorites route */}
+        {/* Favorites route - for buyers only */}
         <Route
           path="/favorites"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute roles={['buyer']}>
               <Favorites />
             </ProtectedRoute>
           }
@@ -108,6 +128,26 @@ const App: React.FC = () => {
         
         {/* Test Drives route */}
         <Route path="/test-drives" element={<TestDrives />} />
+        
+        {/* Deposits route - for buyers only */}
+        <Route
+          path="/deposits"
+          element={
+            <ProtectedRoute roles={['buyer']}>
+              <Deposits />
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Owner Deposits route - for car owners */}
+        <Route
+          path="/owner/deposits"
+          element={
+            <ProtectedRoute roles={['seller']}>
+              <OwnerDeposits />
+            </ProtectedRoute>
+          }
+        />
         
         {/* Catch all route */}
         <Route path="*" element={<Navigate to="/" replace />} />

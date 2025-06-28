@@ -66,6 +66,7 @@ import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { auth } from '../middleware/auth';
 import { Car } from '../models/Car';
+import { Deposit } from '../models/Deposit';
 
 const router = express.Router();
 
@@ -73,14 +74,96 @@ const router = express.Router();
  * @swagger
  * /cars:
  *   get:
- *     summary: Get all cars
+ *     summary: Get available cars (for unauthenticated users)
  *     tags: [Cars]
  *     responses:
  *       200:
- *         description: List of cars
+ *         description: List of available cars
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
+    // Get all cars
+    const cars = await Car.find().populate('seller', 'name email');
+    
+    // For unauthenticated users, show all available cars
+    const availableCars = cars.filter(car => car.status === 'available');
+    res.json(availableCars);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch cars', error });
+  }
+});
+
+/**
+ * @swagger
+ * /cars/authenticated:
+ *   get:
+ *     summary: Get available cars for authenticated users
+ *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of available cars
+ */
+router.get('/authenticated', auth, async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    
+    // Get all cars
+    const cars = await Car.find().populate('seller', 'name email');
+    
+    // If user is admin or seller, show all cars
+    if (user.role === 'admin' || user.role === 'seller') {
+      return res.json(cars);
+    }
+    
+    // For buyers, filter out cars they have already made deposits for
+    if (user.role === 'buyer') {
+      // Get deposits made by this buyer
+      const userDeposits = await Deposit.find({ 
+        buyerId: user._id, 
+        status: { $in: ['pending', 'approved'] } 
+      });
+      const carsWithUserDeposits = new Set(userDeposits.map(deposit => deposit.listingId.toString()));
+      
+      // Filter out cars that this buyer has already made deposits for or are not available
+      const availableCars = cars.filter(car => 
+        car.status === 'available' && !carsWithUserDeposits.has((car as any)._id.toString())
+      );
+      
+      return res.json(availableCars);
+    }
+    
+    // For other authenticated users, show all available cars
+    const availableCars = cars.filter(car => car.status === 'available');
+    res.json(availableCars);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch cars', error });
+  }
+});
+
+/**
+ * @swagger
+ * /cars/all:
+ *   get:
+ *     summary: Get all cars including those with deposits (admin/seller only)
+ *     tags: [Cars]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of all cars
+ *       403:
+ *         description: Access denied
+ */
+router.get('/all', auth, async (req: Request, res: Response) => {
+  try {
+    // Check if user is admin or seller
+    const user = (req as any).user;
+    if (user.role !== 'admin' && user.role !== 'seller') {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
     const cars = await Car.find().populate('seller', 'name email');
     res.json(cars);
   } catch (error) {

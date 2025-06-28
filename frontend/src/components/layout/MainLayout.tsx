@@ -9,7 +9,7 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   return (
     <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
-      <Navbar />
+      <Navbar isAuthenticated={false} onLogout={() => {}} />
       <main className="flex-grow w-full">
         {children}
       </main>

@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchCars, Car } from '../services/carService';
-import { FaCar, FaSearch, FaFilter, FaDollarSign, FaCalendarAlt, FaGasPump, FaCogs, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { fetchAllCars, Car } from '../services/carService';
+import { FaCar, FaSearch, FaFilter, FaDollarSign, FaCalendarAlt, FaGasPump, FaCogs, FaEye } from 'react-icons/fa';
 import authService from '../services/authService';
-import { addFavorite, removeFavorite, fetchFavorites } from '../services/carService';
 
-const Cars = () => {
+const AdminCarsView = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [filteredCars, setFilteredCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,11 +21,9 @@ const Cars = () => {
     maxYear: '',
     fuelType: '',
     transmission: '',
+    status: '',
     sortBy: 'newest',
   });
-
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [favError, setFavError] = useState('');
 
   // Get unique brands and models
   const uniqueBrands = [...new Set(cars.map(car => car.brand))].sort();
@@ -42,7 +39,11 @@ const Cars = () => {
       try {
         setLoading(true);
         const token = authService.getToken();
-        const data = await fetchCars(token || undefined);
+        if (!token) {
+          setError('Не сте влезли в профила си.');
+          return;
+        }
+        const data = await fetchAllCars(token);
         setCars(data);
         setFilteredCars(data);
       } catch (err) {
@@ -94,6 +95,9 @@ const Cars = () => {
     if (filters.transmission) {
       result = result.filter(car => car.transmission === filters.transmission);
     }
+    if (filters.status) {
+      result = result.filter(car => car.status === filters.status);
+    }
 
     // Apply sorting
     switch (filters.sortBy) {
@@ -119,17 +123,6 @@ const Cars = () => {
     setFilteredCars(result);
   }, [cars, searchTerm, selectedBrand, selectedModel, filters]);
 
-  useEffect(() => {
-    const token = authService.getToken();
-    if (token) {
-      fetchFavorites(token)
-        .then(favs => setFavorites(favs.map(car => car._id)))
-        .catch(() => setFavorites([]));
-    } else {
-      setFavorites([]);
-    }
-  }, [authService.getToken()]);
-
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
@@ -146,27 +139,26 @@ const Cars = () => {
       maxYear: '',
       fuelType: '',
       transmission: '',
+      status: '',
       sortBy: 'newest',
     });
   };
 
-  const handleFavorite = async (carId: string) => {
-    const token = authService.getToken();
-    if (!token) {
-      setFavError('Трябва да сте влезли, за да добавяте в любими.');
-      return;
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'available': return 'bg-green-100 text-green-800';
+      case 'reserved': return 'bg-yellow-100 text-yellow-800';
+      case 'sold': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
-    try {
-      if (favorites.includes(carId)) {
-        await removeFavorite(carId, token);
-        setFavorites(favorites.filter(id => id !== carId));
-      } else {
-        await addFavorite(carId, token);
-        setFavorites([...favorites, carId]);
-      }
-      setFavError('');
-    } catch (e) {
-      setFavError('Грешка при добавяне/премахване от любими.');
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'available': return 'Достъпна';
+      case 'reserved': return 'Заета';
+      case 'sold': return 'Продадена';
+      default: return status;
     }
   };
 
@@ -175,16 +167,16 @@ const Cars = () => {
       <div className="w-full max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="animate-fade-in flex items-center gap-4 mb-8">
           <FaCar className="text-4xl text-primary-500 drop-shadow" />
-          <h1 className="text-4xl font-bold text-primary-700 mb-2">Browse Cars</h1>
+          <h1 className="text-4xl font-bold text-primary-700 mb-2">Всички автомобили</h1>
         </div>
-        <p className="text-lg text-primary-700 mb-8">Find your perfect match from our extensive collection</p>
+        <p className="text-lg text-primary-700 mb-8">Преглед на всички автомобили в системата (включително заети)</p>
         
         {/* Search and Filters */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 animate-slide-up border border-primary-100">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Brand and Model Selection */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Brand</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Марка</label>
               <select
                 value={selectedBrand}
                 onChange={(e) => {
@@ -193,35 +185,50 @@ const Cars = () => {
                 }}
                 className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
-                <option value="">All Brands</option>
+                <option value="">Всички марки</option>
                 {uniqueBrands.map(brand => (
                   <option key={brand} value={brand}>{brand}</option>
                 ))}
               </select>
             </div>
-
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Model</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Модел</label>
               <select
                 value={selectedModel}
                 onChange={(e) => setSelectedModel(e.target.value)}
                 className="input rounded-xl border-primary-200 focus:border-primary-500"
                 disabled={!selectedBrand}
               >
-                <option value="">All Models</option>
+                <option value="">Всички модели</option>
                 {filteredModels.map(model => (
                   <option key={model} value={model}>{model}</option>
                 ))}
               </select>
             </div>
 
+            {/* Status Filter */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Статус</label>
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="input rounded-xl border-primary-200 focus:border-primary-500"
+              >
+                <option value="">Всички</option>
+                <option value="available">Достъпна</option>
+                <option value="reserved">Заета</option>
+                <option value="sold">Продадена</option>
+              </select>
+            </div>
+
             {/* Additional Search */}
             <div className="lg:col-span-2 space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaSearch className="text-primary-400" />Search Description & Features</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaSearch className="text-primary-400" />Търсене в описание</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search in description and features..."
+                  placeholder="Търсете в описанието и характеристиките..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="input pl-10 rounded-xl border-primary-200 focus:border-primary-500"
@@ -232,9 +239,9 @@ const Cars = () => {
 
             {/* Price Range */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaDollarSign className="text-primary-400" />Min Price ($)</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaDollarSign className="text-primary-400" />Мин. цена (лв.)</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">лв.</span>
                 <input
                   type="number"
                   name="minPrice"
@@ -245,9 +252,9 @@ const Cars = () => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaDollarSign className="text-primary-400" />Max Price ($)</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaDollarSign className="text-primary-400" />Макс. цена (лв.)</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">лв.</span>
                 <input
                   type="number"
                   name="maxPrice"
@@ -260,7 +267,7 @@ const Cars = () => {
 
             {/* Year Range */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCalendarAlt className="text-primary-400" />Min Year</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCalendarAlt className="text-primary-400" />Мин. година</label>
               <input
                 type="number"
                 name="minYear"
@@ -272,7 +279,7 @@ const Cars = () => {
               />
             </div>
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCalendarAlt className="text-primary-400" />Max Year</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCalendarAlt className="text-primary-400" />Макс. година</label>
               <input
                 type="number"
                 name="maxYear"
@@ -286,50 +293,50 @@ const Cars = () => {
 
             {/* Fuel Type */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaGasPump className="text-primary-400" />Fuel Type</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaGasPump className="text-primary-400" />Гориво</label>
               <select
                 name="fuelType"
                 value={filters.fuelType}
                 onChange={handleFilterChange}
                 className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
-                <option value="">All</option>
-                <option value="petrol">Petrol</option>
-                <option value="diesel">Diesel</option>
-                <option value="electric">Electric</option>
-                <option value="hybrid">Hybrid</option>
+                <option value="">Всички</option>
+                <option value="petrol">Бензин</option>
+                <option value="diesel">Дизел</option>
+                <option value="electric">Електрически</option>
+                <option value="hybrid">Хибриден</option>
               </select>
             </div>
 
             {/* Transmission */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCogs className="text-primary-400" />Transmission</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaCogs className="text-primary-400" />Скоростна кутия</label>
               <select
                 name="transmission"
                 value={filters.transmission}
                 onChange={handleFilterChange}
                 className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
-                <option value="">All</option>
-                <option value="manual">Manual</option>
-                <option value="automatic">Automatic</option>
+                <option value="">Всички</option>
+                <option value="manual">Ръчна</option>
+                <option value="automatic">Автоматична</option>
               </select>
             </div>
 
             {/* Sort By */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Sort By</label>
+              <label className="block text-sm font-medium text-primary-700 flex items-center gap-2"><FaFilter className="text-primary-400" />Сортиране</label>
               <select
                 name="sortBy"
                 value={filters.sortBy}
                 onChange={handleFilterChange}
                 className="input rounded-xl border-primary-200 focus:border-primary-500"
               >
-                <option value="newest">Newest</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="year-desc">Year: New to Old</option>
-                <option value="year-asc">Year: Old to New</option>
+                <option value="newest">Най-нови</option>
+                <option value="price-asc">Цена: Ниска към висока</option>
+                <option value="price-desc">Цена: Висока към ниска</option>
+                <option value="year-desc">Година: Нова към стара</option>
+                <option value="year-asc">Година: Стара към нова</option>
               </select>
             </div>
           </div>
@@ -339,7 +346,7 @@ const Cars = () => {
               onClick={clearFilters}
               type="button"
             >
-              Clear Filters
+              Изчисти филтрите
             </button>
           </div>
         </div>
@@ -357,7 +364,7 @@ const Cars = () => {
           <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {filteredCars.length === 0 ? (
               <div className="col-span-full text-center text-primary-600 text-xl font-semibold py-12 animate-fade-in">
-                No cars found matching your criteria.
+                Не са намерени автомобили според критериите.
               </div>
             ) : (
               filteredCars.map(car => (
@@ -374,34 +381,31 @@ const Cars = () => {
                         {car.brand}
                       </span>
                     </div>
+                    <div className="absolute top-4 left-4">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(car.status)}`}>
+                        {getStatusText(car.status)}
+                      </span>
+                    </div>
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-semibold text-primary-700">{car.brand} {car.carModel}</h3>
                     <p className="mt-2 text-gray-600">{car.year} • {car.fuelType} • {car.transmission}</p>
+                    <p className="mt-1 text-sm text-gray-500">Продавач: {car.seller?.name || 'N/A'}</p>
                     <div className="mt-4 flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary-600">${car.price.toLocaleString()}</span>
-                      <Link to={`/cars/${car._id}`} className="btn-primary text-sm rounded-xl px-4 py-2">View Details</Link>
+                      <span className="text-2xl font-bold text-primary-600">{car.price.toLocaleString('bg-BG')} лв.</span>
+                      <Link to={`/cars/${car._id}`} className="btn-primary text-sm rounded-xl px-4 py-2 flex items-center gap-2">
+                        <FaEye className="text-sm" /> Детайли
+                      </Link>
                     </div>
-                  </div>
-                  <div className="absolute top-4 right-4 z-10">
-                    <button onClick={() => handleFavorite(car._id)} className="focus:outline-none">
-                      {favorites.includes(car._id) ? (
-                        <FaHeart className="text-red-500 text-2xl drop-shadow animate-pulse" />
-                      ) : (
-                        <FaRegHeart className="text-gray-300 text-2xl hover:text-red-400 transition-colors" />
-                      )}
-                    </button>
                   </div>
                 </div>
               ))
             )}
           </div>
         )}
-
-        {favError && <div className="text-red-600 text-center mb-4 animate-fade-in">{favError}</div>}
       </div>
     </div>
   );
 };
 
-export default Cars; 
+export default AdminCarsView; 

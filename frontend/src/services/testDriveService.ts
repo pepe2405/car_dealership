@@ -31,11 +31,20 @@ export async function updateTestDriveRequest(id: string, status: 'approved' | 'r
 }
 
 export async function getTestDriveRequestForCar(carId: string, token: string) {
-  const res = await axios.get(`/api/test-drives?car=${carId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  // Връща само първата намерена заявка (ако има)
-  return Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
+  try {
+    const res = await axios.get(`/api/test-drives?car=${carId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    // Връща само първата намерена заявка (ако има)
+    return Array.isArray(res.data) && res.data.length > 0 ? res.data[0] : null;
+  } catch (error: any) {
+    // If it's a 404 error, return null (no test drive found)
+    if (error.response?.status === 404) {
+      return null;
+    }
+    // For other errors, throw the error
+    throw error;
+  }
 }
 
 export async function deleteTestDriveRequest(id: string, token: string) {

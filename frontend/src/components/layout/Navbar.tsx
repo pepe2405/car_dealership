@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import authService from '../../services/authService';
-import { FaCar, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaUserCircle, FaTachometerAlt, FaPlusCircle, FaUsers, FaClipboardList, FaInfoCircle, FaBars, FaComments, FaHeart, FaCheckCircle, FaCreditCard } from 'react-icons/fa';
+import { FaCar, FaUser, FaSignInAlt, FaUserPlus, FaSignOutAlt, FaUserCircle, FaTachometerAlt, FaPlusCircle, FaUsers, FaClipboardList, FaInfoCircle, FaBars, FaComments, FaHeart, FaCheckCircle, FaCreditCard, FaMoneyBillWave } from 'react-icons/fa';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -12,6 +12,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
   const navigate = useNavigate();
   const currentUser = authService.getCurrentUser();
   const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
+  const isOnlySeller = currentUser?.role === 'seller';
   const [menuOpen, setMenuOpen] = useState(false);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const [menuPos, setMenuPos] = useState<{left: number, top: number} | null>(null);
@@ -51,23 +52,35 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
             >
               <Link to="/cars" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaClipboardList className="text-base" /> Обяви</Link>
               <Link to="/leasing" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCreditCard className="text-base" /> Лизинг</Link>
-              {isSeller && (
+              {isOnlySeller && (
                 <Link to="/sell" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaPlusCircle className="text-base" /> Публикувай</Link>
               )}
               {isSeller && (
                 <Link to="/test-drives" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCheckCircle className="text-base text-green-600" /> Тест драйв заявки</Link>
               )}
+              {isOnlySeller && (
+                <Link to="/owner/deposits" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaMoneyBillWave className="text-base text-blue-600" /> Депозити за моите коли</Link>
+              )}
               {isAuthenticated && (
                 <Link to="/messages" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaComments className="text-base" /> Съобщения</Link>
               )}
-              {isAuthenticated && (
+              {isAuthenticated && currentUser?.role === 'buyer' && (
                 <Link to="/favorites" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaHeart className="text-base text-red-500" /> Любими</Link>
+              )}
+              {isAuthenticated && currentUser?.role === 'buyer' && (
+                <Link to="/deposits" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaMoneyBillWave className="text-base text-green-600" /> Депозити</Link>
               )}
               {currentUser?.role === 'admin' && (
                 <Link to="/admin/users" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaUsers className="text-base" /> Потребители</Link>
               )}
               {currentUser?.role === 'admin' && (
                 <Link to="/admin/cars" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCar className="text-base" /> Админ коли</Link>
+              )}
+              {isSeller && (
+                <Link to="/admin/cars-view" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCar className="text-base" /> Всички коли</Link>
+              )}
+              {currentUser?.role === 'admin' && (
+                <Link to="/admin/deposits" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaMoneyBillWave className="text-base" /> Админ депозити</Link>
               )}
               <Link to="/about" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaInfoCircle className="text-base" /> За нас</Link>
               <Link to="/forums" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaComments className="text-base" /> Форуми</Link>
@@ -80,9 +93,11 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
               <Link to="/profile" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-primary-700 bg-primary-800 text-yellow-300 font-bold shadow hover:bg-yellow-400 hover:text-primary-900 hover:border-yellow-400 transition-all">
                 <FaUserCircle className="text-lg" /> Профил
               </Link>
-              <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-yellow-400 bg-yellow-400 text-primary-900 font-bold shadow hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all">
-                <FaTachometerAlt className="text-lg" /> Табло
-              </Link>
+              {isSeller && (
+                <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-yellow-400 bg-yellow-400 text-primary-900 font-bold shadow hover:bg-primary-700 hover:text-white hover:border-primary-700 transition-all">
+                  <FaTachometerAlt className="text-lg" /> Табло
+                </Link>
+              )}
               <Link to="/messages" className="flex items-center gap-2 px-4 py-2 rounded-full border-2 border-primary-700 bg-primary-700 text-white font-bold shadow hover:bg-primary-900 hover:text-yellow-300 transition-all">
                 <FaComments className="text-lg" /> Съобщения
               </Link>

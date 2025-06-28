@@ -68,7 +68,7 @@ const Forums = () => {
   };
 
   const canDeleteForum = (forum: Forum) => {
-    return currentUser && (currentUser.role === 'admin' || currentUser._id === forum.owner._id);
+    return currentUser && (currentUser.role === 'admin' || currentUser.id === forum.owner._id);
   };
 
   return (

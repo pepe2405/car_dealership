@@ -37,7 +37,21 @@ export interface Car {
   updatedAt: string;
 }
 
-export async function fetchCars(): Promise<Car[]> {
+export async function fetchCars(token?: string): Promise<Car[]> {
+  if (token) {
+    // Use authenticated endpoint for logged in users
+    const response = await api.get(`${API_URL}/authenticated`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } else {
+    // Use regular endpoint for unauthenticated users
+    const response = await api.get(API_URL);
+    return response.data;
+  }
+}
+
+export async function fetchCarsUnauthenticated(): Promise<Car[]> {
   const response = await api.get(API_URL);
   return response.data;
 }
@@ -96,6 +110,20 @@ export async function fetchFavorites(token: string): Promise<Car[]> {
   }
   console.debug('fetchFavorites token:', token);
   const response = await api.get('/api/auth/favorites', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+}
+
+/**
+ * Get all cars including those with deposits (admin/seller only)
+ */
+export async function fetchAllCars(token: string): Promise<Car[]> {
+  if (!token) {
+    throw new Error('Не сте влезли в профила си.');
+  }
+
+  const response = await api.get('/all', {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;

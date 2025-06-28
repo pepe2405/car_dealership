@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Car, fetchCarById } from '../services/carService';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import authService from '../services/authService';
 import { addFavorite, removeFavorite, fetchFavorites } from '../services/carService';
 import { createTestDriveRequest, getTestDriveRequestForCar, deleteTestDriveRequest } from '../services/testDriveService';
+import { checkDepositStatus, DepositStatusResponse } from '../services/depositsService';
+import DepositModal from '../components/DepositModal';
+import DepositStatus from '../components/DepositStatus';
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -16,12 +19,21 @@ const CarDetails = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favError, setFavError] = useState('');
   const currentUser = authService.getCurrentUser();
+  const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
+  const isBuyer = currentUser?.role === 'buyer' || !currentUser?.role; // Default role is buyer
   const [showTestDriveModal, setShowTestDriveModal] = useState(false);
   const [testDriveDate, setTestDriveDate] = useState('');
   const [testDriveMsg, setTestDriveMsg] = useState('');
   const [testDriveError, setTestDriveError] = useState('');
   const [testDriveSuccess, setTestDriveSuccess] = useState('');
   const [myTestDrive, setMyTestDrive] = useState<any>(null);
+  
+  // Deposit related state
+  const [depositStatus, setDepositStatus] = useState<DepositStatusResponse | null>(null);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [depositLoading, setDepositLoading] = useState(false);
+  const isFetchingDeposit = useRef(false);
+  const isFetchingTestDrive = useRef(false);
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -70,11 +82,57 @@ const CarDetails = () => {
       if (!car || !currentUser) return;
       const token = authService.getToken();
       if (!token) return;
-      const req = await getTestDriveRequestForCar(car._id, token);
-      setMyTestDrive(req);
+      
+      // Don't fetch if we're already fetching
+      if (isFetchingTestDrive.current) return;
+      
+      try {
+        isFetchingTestDrive.current = true;
+        const req = await getTestDriveRequestForCar(car._id, token);
+        setMyTestDrive(req);
+      } catch (err: any) {
+        console.error('Error fetching test drive request:', err);
+        // Don't set myTestDrive to null on error to avoid infinite loops
+        // Only set to null if it's a 404 (no test drive found)
+        if (err.response?.status === 404) {
+          setMyTestDrive(null);
+        }
+      } finally {
+        isFetchingTestDrive.current = false;
+      }
     };
     fetchMyTestDrive();
-  }, [car, currentUser]);
+  }, [car?._id, currentUser?.id]); // Use specific IDs instead of objects
+
+  // Fetch deposit status
+  useEffect(() => {
+    const fetchDepositStatus = async () => {
+      if (!car || !currentUser) return;
+      const token = authService.getToken();
+      if (!token) return;
+      
+      // Don't fetch if we're already fetching
+      if (isFetchingDeposit.current) return;
+      
+      try {
+        isFetchingDeposit.current = true;
+        setDepositLoading(true);
+        const status = await checkDepositStatus(car._id, token);
+        setDepositStatus(status);
+      } catch (err: any) {
+        console.error('Error fetching deposit status:', err);
+        // Only set hasDeposit: false if it's a 404 error (no deposit found)
+        // For other errors, don't change the state to avoid infinite loops
+        if (err.response?.status === 404) {
+          setDepositStatus({ hasDeposit: false });
+        }
+      } finally {
+        setDepositLoading(false);
+        isFetchingDeposit.current = false;
+      }
+    };
+    fetchDepositStatus();
+  }, [car?._id, currentUser?.id]); // Use specific IDs instead of objects
 
   const handleFavorite = async (carId: string) => {
     if (!currentUser) {
@@ -124,6 +182,24 @@ const CarDetails = () => {
       setMyTestDrive(null);
     } catch (e) {
       setTestDriveError('Грешка при отказ на заявката.');
+    }
+  };
+
+  const handleDepositCreated = () => {
+    // Refresh deposit status after creating a deposit
+    if (car && currentUser) {
+      const token = authService.getToken();
+      if (token) {
+        checkDepositStatus(car._id, token)
+          .then(setDepositStatus)
+          .catch((err: any) => {
+            console.error('Error refreshing deposit status:', err);
+            // Only update if it's a 404 (no deposit found)
+            if (err.response?.status === 404) {
+              setDepositStatus({ hasDeposit: false });
+            }
+          });
+      }
     }
   };
 
@@ -287,40 +363,81 @@ const CarDetails = () => {
             </div>
           </div>
           {favError && <div className="text-red-600 text-center mb-4 animate-fade-in">{favError}</div>}
-          {myTestDrive ? (
-            <div className="mt-8 flex flex-col items-center justify-center gap-2">
-              <div className={`px-4 py-2 rounded-xl text-lg font-bold shadow ${myTestDrive.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : myTestDrive.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                Заявка за тест драйв: {myTestDrive.status === 'pending' ? 'Изчаква' : myTestDrive.status === 'approved' ? 'Одобрена' : 'Отказана'}
-              </div>
-              <div className="text-gray-700">Дата: {new Date(myTestDrive.date).toLocaleString('bg')}</div>
-              {myTestDrive.message && <div className="text-gray-600 italic">"{myTestDrive.message}"</div>}
-              {myTestDrive.status === 'pending' && (
-                <button
-                  className="btn-secondary mt-4 px-6 py-2 rounded-xl text-base font-bold shadow hover:bg-red-200 transition-all"
-                  onClick={handleCancelTestDrive}
-                >
-                  Откажи заявката
-                </button>
+          
+          {/* Deposits Section */}
+          {currentUser && isBuyer && car.status === 'available' && (
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <h2 className="text-lg font-semibold mb-4">Депозит</h2>
+              
+              {depositLoading ? (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+                </div>
+              ) : depositStatus?.hasDeposit && depositStatus.deposit ? (
+                <DepositStatus deposit={depositStatus.deposit} />
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-6 text-center">
+                  <div className="mb-4">
+                    <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Няма депозит</h3>
+                  <p className="text-gray-600 mb-4">
+                    Направете депозит, за да запазите този автомобил и да покажете сериозност в покупката.
+                  </p>
+                  <button
+                    onClick={() => setShowDepositModal(true)}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                  >
+                    Направи депозит
+                  </button>
+                </div>
               )}
-              {(myTestDrive.status === 'approved' || myTestDrive.status === 'rejected') && (
-                <button
-                  className="btn-primary mt-4 px-6 py-2 rounded-xl text-base font-bold shadow hover:bg-primary-700 transition-all"
-                  onClick={() => setShowTestDriveModal(true)}
-                >
-                  Нова заявка
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="mt-8 flex justify-center">
-              <button
-                className="btn-primary px-8 py-3 rounded-xl text-lg font-bold shadow-lg hover:bg-primary-700 transition-all"
-                onClick={() => setShowTestDriveModal(true)}
-              >
-                Заяви тест драйв
-              </button>
             </div>
           )}
+
+          {/* Test Drive Section */}
+          {currentUser && isBuyer && (
+            <>
+              {myTestDrive ? (
+                <div className="mt-8 flex flex-col items-center justify-center gap-2">
+                  <div className={`px-4 py-2 rounded-xl text-lg font-bold shadow ${myTestDrive.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : myTestDrive.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    Заявка за тест драйв: {myTestDrive.status === 'pending' ? 'Изчаква' : myTestDrive.status === 'approved' ? 'Одобрена' : 'Отказана'}
+                  </div>
+                  <div className="text-gray-700">Дата: {new Date(myTestDrive.date).toLocaleString('bg')}</div>
+                  {myTestDrive.message && <div className="text-gray-600 italic">"{myTestDrive.message}"</div>}
+                  {myTestDrive.status === 'pending' && (
+                    <button
+                      className="btn-secondary mt-4 px-6 py-2 rounded-xl text-base font-bold shadow hover:bg-red-200 transition-all"
+                      onClick={handleCancelTestDrive}
+                    >
+                      Откажи заявката
+                    </button>
+                  )}
+                  {(myTestDrive.status === 'approved' || myTestDrive.status === 'rejected') && (
+                    <button
+                      className="btn-primary mt-4 px-6 py-2 rounded-xl text-base font-bold shadow hover:bg-primary-700 transition-all"
+                      onClick={() => setShowTestDriveModal(true)}
+                    >
+                      Нова заявка
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-8 flex justify-center">
+                  <button
+                    className="btn-primary px-8 py-3 rounded-xl text-lg font-bold shadow-lg hover:bg-primary-700 transition-all"
+                    onClick={() => setShowTestDriveModal(true)}
+                  >
+                    Заяви тест драйв
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Test Drive Modal */}
           {showTestDriveModal && (
             <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
               <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md relative">
@@ -335,6 +452,17 @@ const CarDetails = () => {
                 <button className="btn-primary w-full py-2 rounded-xl font-bold" onClick={handleTestDriveRequest}>Изпрати заявка</button>
               </div>
             </div>
+          )}
+
+          {/* Deposit Modal */}
+          {showDepositModal && car && (
+            <DepositModal
+              isOpen={showDepositModal}
+              onClose={() => setShowDepositModal(false)}
+              carId={car._id}
+              carPrice={car.price}
+              onDepositCreated={handleDepositCreated}
+            />
           )}
         </div>
       </div>

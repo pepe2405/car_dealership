@@ -131,11 +131,11 @@ const ForumDetail: React.FC = () => {
   };
 
   const canDeleteForum = () => {
-    return currentUser && forum && (currentUser.role === 'admin' || currentUser._id === forum.owner._id);
+    return currentUser && forum && (currentUser.role === 'admin' || currentUser.id === forum.owner._id);
   };
 
   const canDeleteComment = (comment: ForumComment) => {
-    return currentUser && (currentUser.role === 'admin' || currentUser._id === comment.author._id);
+    return currentUser && (currentUser.role === 'admin' || currentUser.id === comment.author._id);
   };
 
   if (loading) {
