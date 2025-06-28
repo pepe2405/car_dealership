@@ -15,6 +15,7 @@ import Message from './models/Message';
 import messagesRoutes from './routes/messages';
 import testDriveRoutes from './routes/testDrive';
 import forumRoutes from './routes/forum';
+import leaseOptionsRoutes from './routes/leaseOptions';
 
 // Initialize express app
 const app = express();
@@ -47,6 +48,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api', messagesRoutes);
 app.use('/api/test-drives', testDriveRoutes);
 app.use('/api/forums', forumRoutes);
+app.use('/api/lease-options', leaseOptionsRoutes);
 
 // Swagger setup
 const swaggerOptions = {
