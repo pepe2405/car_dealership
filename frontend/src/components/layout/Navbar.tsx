@@ -69,6 +69,7 @@ const Navbar: React.FC<NavbarProps> = ({ isAuthenticated, onLogout }) => {
                 <Link to="/admin/cars" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaCar className="text-base" /> Админ коли</Link>
               )}
               <Link to="/about" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaInfoCircle className="text-base" /> За нас</Link>
+              <Link to="/forums" onClick={()=>setMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 rounded-lg text-primary-900 hover:bg-primary-100 transition-all"><FaComments className="text-base" /> Форуми</Link>
             </div>
           )}
         </div>

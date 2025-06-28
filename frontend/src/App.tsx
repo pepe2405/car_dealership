@@ -17,6 +17,8 @@ import AdminCars from './pages/AdminCars';
 import Messages from './pages/Messages';
 import Favorites from './pages/Favorites';
 import TestDrives from './pages/TestDrives';
+import Forums from './pages/Forums';
+import ForumDetail from './components/forum/ForumDetail';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -38,6 +40,8 @@ const App: React.FC = () => {
         <Route path="/cars" element={<Cars />} />
         <Route path="/cars/:id" element={<CarDetails />} />
         <Route path="/about" element={<About />} />
+        <Route path="/forums" element={<Forums />} />
+        <Route path="/forums/:id" element={<ForumDetail />} />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         <Route path="/register" element={<Register onRegister={handleRegister} />} />
         
