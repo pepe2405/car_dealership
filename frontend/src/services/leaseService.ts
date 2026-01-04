@@ -1,4 +1,4 @@
-const API = '/api/lease-options';
+const API = "/api/lease-options";
 
 export interface LeaseOption {
   _id: string;
@@ -21,16 +21,19 @@ export async function getLeaseOption(id: string): Promise<LeaseOption> {
   return res.json();
 }
 
-export async function createLeaseOption(data: {
-  name: string;
-  duration: number;
-  downPayment: number;
-  interestRate: number;
-}, token: string): Promise<LeaseOption> {
+export async function createLeaseOption(
+  data: {
+    name: string;
+    duration: number;
+    downPayment: number;
+    interestRate: number;
+  },
+  token: string,
+): Promise<LeaseOption> {
   const res = await fetch(API, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
@@ -38,11 +41,15 @@ export async function createLeaseOption(data: {
   return res.json();
 }
 
-export async function updateLeaseOption(id: string, data: Partial<LeaseOption>, token: string): Promise<LeaseOption> {
+export async function updateLeaseOption(
+  id: string,
+  data: Partial<LeaseOption>,
+  token: string,
+): Promise<LeaseOption> {
   const res = await fetch(`${API}/${id}`, {
-    method: 'PUT',
+    method: "PUT",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
@@ -50,20 +57,24 @@ export async function updateLeaseOption(id: string, data: Partial<LeaseOption>, 
   return res.json();
 }
 
-export async function deleteLeaseOption(id: string, token: string): Promise<void> {
+export async function deleteLeaseOption(
+  id: string,
+  token: string,
+): Promise<void> {
   await fetch(`${API}/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 }
-
 
 export function calculateLease(carPrice: number, leaseOption: LeaseOption) {
   const downPaymentAmount = (carPrice * leaseOption.downPayment) / 100;
   const financedAmount = carPrice - downPaymentAmount;
-  const totalInterest = (financedAmount * leaseOption.interestRate * leaseOption.duration) / (12 * 100);
+  const totalInterest =
+    (financedAmount * leaseOption.interestRate * leaseOption.duration) /
+    (12 * 100);
   const totalAmount = financedAmount + totalInterest;
   const monthlyPayment = totalAmount / leaseOption.duration;
 
@@ -74,6 +85,6 @@ export function calculateLease(carPrice: number, leaseOption: LeaseOption) {
     totalInterest,
     totalAmount,
     monthlyPayment,
-    totalPayments: monthlyPayment * leaseOption.duration
+    totalPayments: monthlyPayment * leaseOption.duration,
   };
-} 
+}

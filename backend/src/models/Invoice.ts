@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IInvoice extends Document {
   saleId: mongoose.Types.ObjectId;
@@ -32,73 +32,92 @@ export interface IInvoice extends Document {
   total: number;
   paymentTerms: string;
   dueDate: Date;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const InvoiceSchema = new Schema<IInvoice>({
-  saleId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Sale',
-    required: true,
-  },
-  invoiceNumber: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  buyerInfo: {
-    name: {
-      type: String,
+const InvoiceSchema = new Schema<IInvoice>(
+  {
+    saleId: {
+      type: Schema.Types.ObjectId,
+      ref: "Sale",
       required: true,
     },
-    email: {
+    invoiceNumber: {
       type: String,
       required: true,
+      unique: true,
     },
-    address: String,
-    phone: String,
-  },
-  sellerInfo: {
-    name: {
-      type: String,
-      required: true,
+    buyerInfo: {
+      name: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+      address: String,
+      phone: String,
     },
-    email: {
-      type: String,
-      required: true,
+    sellerInfo: {
+      name: {
+        type: String,
+        required: true,
+      },
+      email: {
+        type: String,
+        required: true,
+      },
+      address: String,
+      phone: String,
     },
-    address: String,
-    phone: String,
-  },
-  carInfo: {
-    brand: {
-      type: String,
-      required: true,
+    carInfo: {
+      brand: {
+        type: String,
+        required: true,
+      },
+      model: {
+        type: String,
+        required: true,
+      },
+      year: {
+        type: Number,
+        required: true,
+      },
+      vin: String,
     },
-    model: {
-      type: String,
-      required: true,
-    },
-    year: {
+    items: [
+      {
+        description: {
+          type: String,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+        unitPrice: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+        total: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
+      },
+    ],
+    subtotal: {
       type: Number,
       required: true,
+      min: 0,
     },
-    vin: String,
-  },
-  items: [{
-    description: {
-      type: String,
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    unitPrice: {
+    tax: {
       type: Number,
       required: true,
       min: 0,
@@ -108,55 +127,39 @@ const InvoiceSchema = new Schema<IInvoice>({
       required: true,
       min: 0,
     },
-  }],
-  subtotal: {
-    type: Number,
-    required: true,
-    min: 0,
+    paymentTerms: {
+      type: String,
+      default: "Net 30",
+    },
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["draft", "sent", "paid", "overdue", "cancelled"],
+      default: "draft",
+    },
+    notes: {
+      type: String,
+      maxlength: 1000,
+    },
   },
-  tax: {
-    type: Number,
-    required: true,
-    min: 0,
+  {
+    timestamps: true,
   },
-  total: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  paymentTerms: {
-    type: String,
-    default: 'Net 30',
-  },
-  dueDate: {
-    type: Date,
-    required: true,
-  },
-  status: {
-    type: String,
-    enum: ['draft', 'sent', 'paid', 'overdue', 'cancelled'],
-    default: 'draft',
-  },
-  notes: {
-    type: String,
-    maxlength: 1000,
-  },
-}, {
-  timestamps: true,
-});
+);
 
-
-InvoiceSchema.pre('save', async function(next) {
+InvoiceSchema.pre("save", async function (next) {
   if (this.isNew && !this.invoiceNumber) {
-    const count = await mongoose.model('Invoice').countDocuments();
-    this.invoiceNumber = `INV-${new Date().getFullYear()}-${String(count + 1).padStart(4, '0')}`;
+    const count = await mongoose.model("Invoice").countDocuments();
+    this.invoiceNumber = `INV-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`;
   }
   next();
 });
-
 
 InvoiceSchema.index({ saleId: 1 });
 InvoiceSchema.index({ invoiceNumber: 1 });
 InvoiceSchema.index({ status: 1 });
 
-export default mongoose.model<IInvoice>('Invoice', InvoiceSchema); 
+export default mongoose.model<IInvoice>("Invoice", InvoiceSchema);

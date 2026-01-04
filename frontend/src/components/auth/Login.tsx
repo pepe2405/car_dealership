@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import authService from '../../services/authService';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 interface LoginProps {
   onLogin?: () => void;
@@ -9,10 +9,10 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,24 +20,25 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    if (error) setError('');
+    if (error) setError("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       await authService.login(formData.email, formData.password);
       if (onLogin) onLogin();
-      navigate('/');
+      navigate("/");
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
-        (Array.isArray(err.response?.data?.errors) && err.response.data.errors[0]?.msg) ||
-        err.message ||
-        'An error occurred during login'
+          (Array.isArray(err.response?.data?.errors) &&
+            err.response.data.errors[0]?.msg) ||
+          err.message ||
+          "An error occurred during login",
       );
     } finally {
       setLoading(false);
@@ -55,7 +56,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="rounded-md bg-red-100 border border-red-400 p-4 mb-4 flex items-center justify-center">
-              <span className="text-sm text-red-700 font-semibold text-center">{error}</span>
+              <span className="text-sm text-red-700 font-semibold text-center">
+                {error}
+              </span>
             </div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
@@ -99,7 +102,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>
@@ -108,4 +111,4 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   );
 };
 
-export default Login; 
+export default Login;

@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
-import { UserProfile } from '../services/userService';
-import authService from '../services/authService';
-import { getAllUsers, updateUser, deleteUser } from '../services/adminService';
-
+import { useEffect, useState } from "react";
+import { UserProfile } from "../services/userService";
+import authService from "../services/authService";
+import { getAllUsers, updateUser, deleteUser } from "../services/adminService";
 
 interface MongoUser {
   _id: string;
@@ -19,11 +18,11 @@ interface MongoUser {
 const AdminUsers = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchUsers();
@@ -32,27 +31,27 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
-      console.log('Fetching users with token:', token);
+      if (!token) throw new Error("Not authenticated");
+      console.log("Fetching users with token:", token);
       const data = await getAllUsers(token);
-      console.log('Received users data:', data);
-     
-      const validUsers = (data as unknown as MongoUser[]).map(user => ({
+      console.log("Received users data:", data);
+
+      const validUsers = (data as unknown as MongoUser[]).map((user) => ({
         id: user._id.toString(),
         email: user.email,
         name: user.name,
         role: user.role,
-        phone: user.phone || '',
-        address: user.address || ''
+        phone: user.phone || "",
+        address: user.address || "",
       }));
-      console.log('Transformed users:', validUsers);
+      console.log("Transformed users:", validUsers);
       setUsers(validUsers);
     } catch (err: any) {
-      console.error('Error details:', err);
-      setError('Failed to load users');
-      console.error('Error fetching users:', err);
+      console.error("Error details:", err);
+      setError("Failed to load users");
+      console.error("Error fetching users:", err);
     } finally {
       setLoading(false);
     }
@@ -66,43 +65,43 @@ const AdminUsers = () => {
   const handleSave = async () => {
     if (!editingUser || !editingUser.id) return;
     try {
-      setError('');
-      setSuccess('');
+      setError("");
+      setSuccess("");
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       await updateUser(token, editingUser.id, editingUser);
-      setUsers(users.map(u => u.id === editingUser.id ? editingUser : u));
+      setUsers(users.map((u) => (u.id === editingUser.id ? editingUser : u)));
       setEditingUser(null);
-      setSuccess('User updated successfully');
+      setSuccess("User updated successfully");
     } catch (err: any) {
-      setError('Failed to update user');
-      console.error('Error updating user:', err);
+      setError("Failed to update user");
+      console.error("Error updating user:", err);
     }
   };
 
   const handleDelete = async (userId: string) => {
     if (!userId) return;
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      setError('');
-      setSuccess('');
+      setError("");
+      setSuccess("");
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       await deleteUser(token, userId);
-      setUsers(users.filter(u => u.id !== userId));
-      setSuccess('User deleted successfully');
+      setUsers(users.filter((u) => u.id !== userId));
+      setSuccess("User deleted successfully");
     } catch (err: any) {
-      setError('Failed to delete user');
-      console.error('Error deleting user:', err);
+      setError("Failed to delete user");
+      console.error("Error deleting user:", err);
     }
   };
 
-  const filteredUsers = users.filter(user => {
+  const filteredUsers = users.filter((user) => {
     if (!user || !user.id) return false;
-    const matchesSearch = 
-      (user.name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (user.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+    const matchesSearch =
+      (user.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (user.email?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
     return matchesSearch && matchesRole;
   });
 
@@ -125,8 +124,16 @@ const AdminUsers = () => {
           <div className="bg-red-50 border-l-4 border-red-400 p-4">
             <div className="flex">
               <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
                 </svg>
               </div>
               <div className="ml-3">
@@ -146,7 +153,9 @@ const AdminUsers = () => {
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-8">
             <h1 className="text-3xl font-bold text-white">User Management</h1>
-            <p className="mt-2 text-primary-100">Manage user accounts and permissions</p>
+            <p className="mt-2 text-primary-100">
+              Manage user accounts and permissions
+            </p>
           </div>
 
           {/* Filters */}
@@ -193,11 +202,21 @@ const AdminUsers = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Role
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Phone
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -207,22 +226,36 @@ const AdminUsers = () => {
                       {editingUser?.id === user.id ? (
                         <input
                           type="text"
-                          value={editingUser.name || ''}
-                          onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                          value={editingUser.name || ""}
+                          onChange={(e) =>
+                            setEditingUser({
+                              ...editingUser,
+                              name: e.target.value,
+                            })
+                          }
                           className="input"
                         />
                       ) : (
-                        <div className="text-sm font-medium text-gray-900">{user.name || '-'}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {user.name || "-"}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{user.email || '-'}</div>
+                      <div className="text-sm text-gray-900">
+                        {user.email || "-"}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {editingUser?.id === user.id ? (
                         <select
-                          value={editingUser.role || 'buyer'}
-                          onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                          value={editingUser.role || "buyer"}
+                          onChange={(e) =>
+                            setEditingUser({
+                              ...editingUser,
+                              role: e.target.value,
+                            })
+                          }
                           className="input"
                         >
                           <option value="buyer">Buyer</option>
@@ -230,11 +263,20 @@ const AdminUsers = () => {
                           <option value="admin">Admin</option>
                         </select>
                       ) : (
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                          ${user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                            user.role === 'seller' ? 'bg-blue-100 text-blue-800' : 
-                            'bg-green-100 text-green-800'}`}>
-                          {user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : '-'}
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                          ${
+                            user.role === "admin"
+                              ? "bg-purple-100 text-purple-800"
+                              : user.role === "seller"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-green-100 text-green-800"
+                          }`}
+                        >
+                          {user.role
+                            ? user.role.charAt(0).toUpperCase() +
+                              user.role.slice(1)
+                            : "-"}
                         </span>
                       )}
                     </td>
@@ -242,12 +284,19 @@ const AdminUsers = () => {
                       {editingUser?.id === user.id ? (
                         <input
                           type="text"
-                          value={editingUser.phone || ''}
-                          onChange={(e) => setEditingUser({ ...editingUser, phone: e.target.value })}
+                          value={editingUser.phone || ""}
+                          onChange={(e) =>
+                            setEditingUser({
+                              ...editingUser,
+                              phone: e.target.value,
+                            })
+                          }
                           className="input"
                         />
                       ) : (
-                        <div className="text-sm text-gray-900">{user.phone || '-'}</div>
+                        <div className="text-sm text-gray-900">
+                          {user.phone || "-"}
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -294,4 +343,4 @@ const AdminUsers = () => {
   );
 };
 
-export default AdminUsers; 
+export default AdminUsers;

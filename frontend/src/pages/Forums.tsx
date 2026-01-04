@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import authService from '../services/authService';
-import CreateForum from '../components/forum/CreateForum';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import authService from "../services/authService";
+import CreateForum from "../components/forum/CreateForum";
 
 interface Forum {
   _id: string;
@@ -22,60 +22,62 @@ interface ForumComment {
 const Forums = () => {
   const [forums, setForums] = useState<Forum[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [actionError, setActionError] = useState('');
-  const [actionSuccess, setActionSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [actionSuccess, setActionSuccess] = useState("");
   const currentUser = authService.getCurrentUser();
   const token = authService.getToken();
 
   useEffect(() => {
     fetchForums();
-   
   }, []);
 
   const fetchForums = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
-      const res = await fetch('/api/forums');
+      const res = await fetch("/api/forums");
       const data = await res.json();
       setForums(data);
     } catch {
-      setError('Грешка при зареждане на форумите.');
+      setError("Грешка при зареждане на форумите.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteForum = async (forumId: string) => {
-    setActionError(''); 
-    setActionSuccess('');
-    
-    if (!window.confirm('Сигурни ли сте, че искате да изтриете този форум?')) {
+    setActionError("");
+    setActionSuccess("");
+
+    if (!window.confirm("Сигурни ли сте, че искате да изтриете този форум?")) {
       return;
     }
 
     try {
       await fetch(`/api/forums/${forumId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      setForums(forums => forums.filter(f => f._id !== forumId));
-      setActionSuccess('Форумът е изтрит!');
+      setForums((forums) => forums.filter((f) => f._id !== forumId));
+      setActionSuccess("Форумът е изтрит!");
     } catch {
-      setActionError('Грешка при изтриване на форума.');
+      setActionError("Грешка при изтриване на форума.");
     }
   };
 
   const canDeleteForum = (forum: Forum) => {
-    return currentUser && (currentUser.role === 'admin' || currentUser.id === forum.owner._id);
+    return (
+      currentUser &&
+      (currentUser.role === "admin" || currentUser.id === forum.owner._id)
+    );
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-primary-100 py-12">
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-primary-800 mb-8">Форуми</h1>
-        
+
         {/* Бутон за създаване на форум */}
         {currentUser && <CreateForum onForumCreated={fetchForums} />}
 
@@ -90,12 +92,13 @@ const Forums = () => {
             Няма намерени форуми.
             {!currentUser && (
               <div className="mt-4">
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="text-primary-600 hover:text-primary-700 underline"
                 >
                   Влезте в профила си
-                </Link> за да създадете първия форум!
+                </Link>{" "}
+                за да създадете първия форум!
               </div>
             )}
           </div>
@@ -106,13 +109,13 @@ const Forums = () => {
                 Всички форуми ({forums.length})
               </h2>
               <div className="space-y-3">
-                {forums.map(forum => (
-                  <div 
-                    key={forum._id} 
+                {forums.map((forum) => (
+                  <div
+                    key={forum._id}
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
                   >
                     <div className="flex-1">
-                      <Link 
+                      <Link
                         to={`/forums/${forum._id}`}
                         className="block hover:text-primary-600 transition-colors duration-200"
                       >
@@ -125,7 +128,9 @@ const Forums = () => {
                           <span>{forum.comments.length} коментара</span>
                           <span>•</span>
                           <span className="text-gray-500">
-                            {new Date(forum.createdAt || Date.now()).toLocaleDateString('bg')}
+                            {new Date(
+                              forum.createdAt || Date.now(),
+                            ).toLocaleDateString("bg")}
                           </span>
                         </div>
                       </Link>
@@ -161,4 +166,4 @@ const Forums = () => {
   );
 };
 
-export default Forums; 
+export default Forums;

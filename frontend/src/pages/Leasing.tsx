@@ -1,22 +1,26 @@
-import { useState } from 'react';
-import LeaseOptions from '../components/leasing/LeaseOptions';
-import LeaseCalculator from '../components/leasing/LeaseCalculator';
-import LeaseOptionsAdmin from '../components/leasing/LeaseOptionsAdmin';
-import authService from '../services/authService';
+import { useState } from "react";
+import LeaseOptions from "../components/leasing/LeaseOptions";
+import LeaseCalculator from "../components/leasing/LeaseCalculator";
+import LeaseOptionsAdmin from "../components/leasing/LeaseOptionsAdmin";
+import authService from "../services/authService";
 
 const Leasing: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'options' | 'calculator' | 'admin'>('options');
+  const [activeTab, setActiveTab] = useState<
+    "options" | "calculator" | "admin"
+  >("options");
   const currentUser = authService.getCurrentUser();
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role === "admin";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-primary-100 py-12">
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-primary-800 mb-4">Лизинг на автомобили</h1>
+          <h1 className="text-4xl font-bold text-primary-800 mb-4">
+            Лизинг на автомобили
+          </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Открийте нашите изгодни опции за лизинг и изчислете вашите месечни вноски. 
-            Гъвкави условия и конкурентни цени за всички бюджети.
+            Открийте нашите изгодни опции за лизинг и изчислете вашите месечни
+            вноски. Гъвкави условия и конкурентни цени за всички бюджети.
           </p>
         </div>
 
@@ -24,32 +28,32 @@ const Leasing: React.FC = () => {
         <div className="flex justify-center mb-8">
           <div className="bg-white rounded-lg shadow-md p-1">
             <button
-              onClick={() => setActiveTab('options')}
+              onClick={() => setActiveTab("options")}
               className={`px-6 py-3 rounded-md font-semibold transition-colors duration-200 ${
-                activeTab === 'options'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-gray-600 hover:text-primary-600'
+                activeTab === "options"
+                  ? "bg-primary-600 text-white"
+                  : "text-gray-600 hover:text-primary-600"
               }`}
             >
               Опции за лизинг
             </button>
             <button
-              onClick={() => setActiveTab('calculator')}
+              onClick={() => setActiveTab("calculator")}
               className={`px-6 py-3 rounded-md font-semibold transition-colors duration-200 ${
-                activeTab === 'calculator'
-                  ? 'bg-primary-600 text-white'
-                  : 'text-gray-600 hover:text-primary-600'
+                activeTab === "calculator"
+                  ? "bg-primary-600 text-white"
+                  : "text-gray-600 hover:text-primary-600"
               }`}
             >
               Калкулатор
             </button>
             {isAdmin && (
               <button
-                onClick={() => setActiveTab('admin')}
+                onClick={() => setActiveTab("admin")}
                 className={`px-6 py-3 rounded-md font-semibold transition-colors duration-200 ${
-                  activeTab === 'admin'
-                    ? 'bg-primary-600 text-white'
-                    : 'text-gray-600 hover:text-primary-600'
+                  activeTab === "admin"
+                    ? "bg-primary-600 text-white"
+                    : "text-gray-600 hover:text-primary-600"
                 }`}
               >
                 Управление
@@ -60,7 +64,7 @@ const Leasing: React.FC = () => {
 
         {/* Content */}
         <div className="mb-8">
-          {activeTab === 'options' && (
+          {activeTab === "options" && (
             <div>
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-primary-800 mb-4">
@@ -74,7 +78,7 @@ const Leasing: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'calculator' && (
+          {activeTab === "calculator" && (
             <div>
               <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-primary-800 mb-4">
@@ -88,7 +92,7 @@ const Leasing: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'admin' && isAdmin && (
+          {activeTab === "admin" && isAdmin && (
             <div>
               <LeaseOptionsAdmin />
             </div>
@@ -99,4 +103,4 @@ const Leasing: React.FC = () => {
   );
 };
 
-export default Leasing; 
+export default Leasing;

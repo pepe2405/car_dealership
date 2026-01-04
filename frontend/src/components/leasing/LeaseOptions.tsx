@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
-import { getLeaseOptions, LeaseOption } from '../../services/leaseService';
+import { useEffect, useState } from "react";
+import { getLeaseOptions, LeaseOption } from "../../services/leaseService";
 
 const LeaseOptions: React.FC = () => {
   const [leaseOptions, setLeaseOptions] = useState<LeaseOption[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchLeaseOptions();
@@ -16,7 +16,7 @@ const LeaseOptions: React.FC = () => {
       const options = await getLeaseOptions();
       setLeaseOptions(options);
     } catch (err) {
-      setError('Грешка при зареждане на опциите за лизинг.');
+      setError("Грешка при зареждане на опциите за лизинг.");
     } finally {
       setLoading(false);
     }
@@ -31,11 +31,7 @@ const LeaseOptions: React.FC = () => {
   }
 
   if (error) {
-    return (
-      <div className="text-center text-red-600 py-8">
-        {error}
-      </div>
-    );
+    return <div className="text-center text-red-600 py-8">{error}</div>;
   }
 
   if (leaseOptions.length === 0) {
@@ -92,4 +88,4 @@ const LeaseOptions: React.FC = () => {
   );
 };
 
-export default LeaseOptions; 
+export default LeaseOptions;

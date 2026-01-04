@@ -1,16 +1,15 @@
-import express from 'express';
-import { auth } from '../middleware/auth';
-import TestDriveRequest from '../models/TestDriveRequest';
-import { Car } from '../models/Car';
+import express from "express";
+import { auth } from "../middleware/auth";
+import TestDriveRequest from "../models/TestDriveRequest";
+import { Car } from "../models/Car";
 
 const router = express.Router();
 
-
-router.post('/', auth, async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const { car, date, message } = req.body;
     const carDoc = await Car.findById(car);
-    if (!carDoc) return res.status(404).json({ message: 'Car not found' });
+    if (!carDoc) return res.status(404).json({ message: "Car not found" });
     const seller = carDoc.seller;
     const buyer = (req as any).user._id;
     const testDrive = await TestDriveRequest.create({
@@ -19,95 +18,104 @@ router.post('/', auth, async (req, res) => {
       seller,
       date,
       message,
-      status: 'pending',
+      status: "pending",
     });
     res.status(201).json(testDrive);
   } catch (e) {
-    res.status(500).json({ message: 'Failed to create test drive request', error: e });
+    res
+      .status(500)
+      .json({ message: "Failed to create test drive request", error: e });
   }
 });
 
-
-router.get('/', auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const userId = (req as any).user._id;
     const role = (req as any).user.role;
     const carId = req.query.car as string | undefined;
     let requests;
     if (carId) {
-     
       requests = await TestDriveRequest.find({ car: carId, buyer: userId })
-        .populate('car')
-        .populate('buyer', 'name email')
-        .populate('seller', 'name email');
+        .populate("car")
+        .populate("buyer", "name email")
+        .populate("seller", "name email");
       return res.json(requests);
     }
-    if (role === 'seller' || role === 'admin') {
+    if (role === "seller" || role === "admin") {
       requests = await TestDriveRequest.find({ seller: userId })
-        .populate('car')
-        .populate('buyer', 'name email')
-        .populate('seller', 'name email');
+        .populate("car")
+        .populate("buyer", "name email")
+        .populate("seller", "name email");
     } else {
       requests = await TestDriveRequest.find({ buyer: userId })
-        .populate('car')
-        .populate('buyer', 'name email')
-        .populate('seller', 'name email');
+        .populate("car")
+        .populate("buyer", "name email")
+        .populate("seller", "name email");
     }
     res.json(requests);
   } catch (e) {
-    res.status(500).json({ message: 'Failed to fetch test drive requests', error: e });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch test drive requests", error: e });
   }
 });
 
-
-router.get('/:id', auth, async (req, res) => {
+router.get("/:id", auth, async (req, res) => {
   try {
     const request = await TestDriveRequest.findById(req.params.id)
-      .populate('car')
-      .populate('buyer', 'name email')
-      .populate('seller', 'name email');
-    if (!request) return res.status(404).json({ message: 'Request not found' });
+      .populate("car")
+      .populate("buyer", "name email")
+      .populate("seller", "name email");
+    if (!request) return res.status(404).json({ message: "Request not found" });
     res.json(request);
   } catch (e) {
-    res.status(500).json({ message: 'Failed to fetch test drive request', error: e });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch test drive request", error: e });
   }
 });
 
-
-router.put('/:id', auth, async (req, res) => {
+router.put("/:id", auth, async (req, res) => {
   try {
     const userId = (req as any).user._id;
     const { status } = req.body;
     const request = await TestDriveRequest.findById(req.params.id);
-    if (!request) return res.status(404).json({ message: 'Request not found' });
+    if (!request) return res.status(404).json({ message: "Request not found" });
     if (request.seller.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'Only the seller can approve/reject this request' });
+      return res
+        .status(403)
+        .json({ message: "Only the seller can approve/reject this request" });
     }
-    if (!['approved', 'rejected'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
     }
     request.status = status;
     await request.save();
     res.json(request);
   } catch (e) {
-    res.status(500).json({ message: 'Failed to update test drive request', error: e });
+    res
+      .status(500)
+      .json({ message: "Failed to update test drive request", error: e });
   }
 });
 
-
-router.delete('/:id', auth, async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   try {
     const userId = (req as any).user._id;
     const request = await TestDriveRequest.findById(req.params.id);
-    if (!request) return res.status(404).json({ message: 'Request not found' });
+    if (!request) return res.status(404).json({ message: "Request not found" });
     if (request.buyer.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'Only the buyer can cancel this request' });
+      return res
+        .status(403)
+        .json({ message: "Only the buyer can cancel this request" });
     }
     await request.deleteOne();
-    res.json({ message: 'Request cancelled' });
+    res.json({ message: "Request cancelled" });
   } catch (e) {
-    res.status(500).json({ message: 'Failed to cancel test drive request', error: e });
+    res
+      .status(500)
+      .json({ message: "Failed to cancel test drive request", error: e });
   }
 });
 
-export default router; 
+export default router;

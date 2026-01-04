@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface IForumComment {
   content: string;
@@ -16,16 +16,16 @@ export interface IForum extends Document {
 
 const ForumCommentSchema = new Schema<IForumComment>({
   content: { type: String, required: true },
-  author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  createdAt: { type: Date, default: Date.now }
+  author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const ForumSchema = new Schema<IForum>({
   title: { type: String, required: true },
   description: { type: String },
-  owner: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
   comments: [ForumCommentSchema],
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.model<IForum>('Forum', ForumSchema); 
+export default mongoose.model<IForum>("Forum", ForumSchema);

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { createDeposit, CreateDepositData } from '../services/depositsService';
-import authService from '../services/authService';
+import { useState } from "react";
+import { createDeposit, CreateDepositData } from "../services/depositsService";
+import authService from "../services/authService";
 
 interface DepositModalProps {
   isOpen: boolean;
@@ -10,35 +10,41 @@ interface DepositModalProps {
   onDepositCreated: () => void;
 }
 
-const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: DepositModalProps) => {
-  const [amount, setAmount] = useState('');
-  const [notes, setNotes] = useState('');
+const DepositModal = ({
+  isOpen,
+  onClose,
+  carId,
+  carPrice,
+  onDepositCreated,
+}: DepositModalProps) => {
+  const [amount, setAmount] = useState("");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     setLoading(true);
 
     const token = authService.getToken();
     if (!token) {
-      setError('Не сте влезли в профила си.');
+      setError("Не сте влезли в профила си.");
       setLoading(false);
       return;
     }
 
     const depositAmount = parseFloat(amount);
     if (isNaN(depositAmount) || depositAmount <= 0) {
-      setError('Моля въведете валидна сума.');
+      setError("Моля въведете валидна сума.");
       setLoading(false);
       return;
     }
 
     if (depositAmount > carPrice) {
-      setError('Депозитът не може да бъде по-голям от цената на колата.');
+      setError("Депозитът не може да бъде по-голям от цената на колата.");
       setLoading(false);
       return;
     }
@@ -51,22 +57,21 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
       };
 
       await createDeposit(depositData, token);
-      setSuccess('Депозитът е създаден успешно!');
-      setAmount('');
-      setNotes('');
-      
-     
+      setSuccess("Депозитът е създаден успешно!");
+      setAmount("");
+      setNotes("");
+
       setTimeout(() => {
         onDepositCreated();
         onClose();
-        setSuccess('');
+        setSuccess("");
       }, 2000);
     } catch (err: any) {
-      console.error('Error creating deposit:', err);
+      console.error("Error creating deposit:", err);
       setError(
-        err.response?.data?.message || 
-        err.message || 
-        'Грешка при създаване на депозита. Моля опитайте отново.'
+        err.response?.data?.message ||
+          err.message ||
+          "Грешка при създаване на депозита. Моля опитайте отново.",
       );
     } finally {
       setLoading(false);
@@ -75,10 +80,10 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
 
   const handleClose = () => {
     if (!loading) {
-      setAmount('');
-      setNotes('');
-      setError('');
-      setSuccess('');
+      setAmount("");
+      setNotes("");
+      setError("");
+      setSuccess("");
       onClose();
     }
   };
@@ -90,14 +95,26 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">Създаване на депозит</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Създаване на депозит
+            </h2>
             <button
               onClick={handleClose}
               disabled={loading}
               className="text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -116,7 +133,10 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="amount"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Сума на депозита (лв.)
               </label>
               <input
@@ -133,12 +153,15 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Максимална сума: {carPrice.toLocaleString('bg-BG')} лв.
+                Максимална сума: {carPrice.toLocaleString("bg-BG")} лв.
               </p>
             </div>
 
             <div>
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="notes"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Бележки (по желание)
               </label>
               <textarea
@@ -172,7 +195,7 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
                     Създаване...
                   </div>
                 ) : (
-                  'Създай депозит'
+                  "Създай депозит"
                 )}
               </button>
             </div>
@@ -183,4 +206,4 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
   );
 };
 
-export default DepositModal; 
+export default DepositModal;

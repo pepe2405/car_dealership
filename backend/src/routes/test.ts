@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 
 const router = express.Router();
 
@@ -22,8 +22,8 @@ const router = express.Router();
  *                   type: string
  *                   format: date-time
  */
-router.get('/ping', (req, res) => {
-  res.json({ message: 'pong', timestamp: new Date().toISOString() });
+router.get("/ping", (req, res) => {
+  res.json({ message: "pong", timestamp: new Date().toISOString() });
 });
 
-export default router; 
+export default router;

@@ -1,16 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
-
-const API_URL = '/api/sales';
-
+const API_URL = "/api/sales";
 
 axios.defaults.withCredentials = true;
-
 
 const api = axios.create({
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -34,13 +31,13 @@ export interface Sale {
     name: string;
     email: string;
   };
-  saleType: 'full' | 'leasing';
+  saleType: "full" | "leasing";
   totalAmount: number;
   downPayment?: number;
   monthlyPayment?: number;
   leaseTerm?: number;
   interestRate?: number;
-  status: 'pending' | 'completed' | 'cancelled';
+  status: "pending" | "completed" | "cancelled";
   saleDate: string;
   notes?: string;
   createdAt: string;
@@ -50,7 +47,7 @@ export interface Sale {
 export interface CreateSaleData {
   carId: string;
   buyerId: string;
-  saleType: 'full' | 'leasing';
+  saleType: "full" | "leasing";
   totalAmount: number;
   downPayment?: number;
   monthlyPayment?: number;
@@ -94,7 +91,7 @@ export interface Invoice {
   total: number;
   paymentTerms: string;
   dueDate: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -131,9 +128,12 @@ export interface CreateInvoiceData {
 /**
  * Create a new sale
  */
-export async function createSale(data: CreateSaleData, token: string): Promise<{ message: string; sale: Sale }> {
+export async function createSale(
+  data: CreateSaleData,
+  token: string,
+): Promise<{ message: string; sale: Sale }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.post(API_URL, data, {
@@ -147,7 +147,7 @@ export async function createSale(data: CreateSaleData, token: string): Promise<{
  */
 export async function fetchSales(token: string): Promise<Sale[]> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.get(API_URL, {
@@ -159,9 +159,13 @@ export async function fetchSales(token: string): Promise<Sale[]> {
 /**
  * Generate invoice for a sale
  */
-export async function generateInvoice(saleId: string, data: CreateInvoiceData, token: string): Promise<{ message: string; invoice: Invoice }> {
+export async function generateInvoice(
+  saleId: string,
+  data: CreateInvoiceData,
+  token: string,
+): Promise<{ message: string; invoice: Invoice }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.post(`${API_URL}/${saleId}/invoice`, data, {
@@ -173,13 +177,16 @@ export async function generateInvoice(saleId: string, data: CreateInvoiceData, t
 /**
  * Get invoice for a sale
  */
-export async function getInvoice(saleId: string, token: string): Promise<{ sale: Sale; invoice: Invoice }> {
+export async function getInvoice(
+  saleId: string,
+  token: string,
+): Promise<{ sale: Sale; invoice: Invoice }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.get(`${API_URL}/${saleId}/invoice`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
-} 
+}

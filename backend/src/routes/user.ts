@@ -1,8 +1,8 @@
-import express, { Request, Response, NextFunction } from 'express';
-import { body, validationResult } from 'express-validator';
-import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
-import { auth } from '../middleware/auth';
+import express, { Request, Response, NextFunction } from "express";
+import { body, validationResult } from "express-validator";
+import jwt from "jsonwebtoken";
+import { User } from "../models/User";
+import { auth } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -45,16 +45,15 @@ const router = express.Router();
  *           $ref: '#/components/schemas/User'
  */
 
-
 router.post(
-  '/register',
+  "/register",
   [
-    body('email').isEmail().withMessage('Please enter a valid email'),
-    body('password')
+    body("email").isEmail().withMessage("Please enter a valid email"),
+    body("password")
       .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters long'),
-    body('name').notEmpty().withMessage('Name is required'),
-    body('role').isIn(['buyer', 'seller', 'admin']).withMessage('Invalid role'),
+      .withMessage("Password must be at least 6 characters long"),
+    body("name").notEmpty().withMessage("Name is required"),
+    body("role").isIn(["buyer", "seller", "admin"]).withMessage("Invalid role"),
   ],
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -66,14 +65,12 @@ router.post(
 
       const { email, password, name, role, phone, address } = req.body;
 
-     
       let user = await User.findOne({ email });
       if (user) {
-        res.status(400).json({ message: 'User already exists' });
+        res.status(400).json({ message: "User already exists" });
         return;
       }
 
-     
       user = new User({
         email,
         password,
@@ -85,11 +82,10 @@ router.post(
 
       await user.save();
 
-     
       const token = jwt.sign(
         { _id: user._id },
-        process.env.JWT_SECRET || 'your_jwt_secret_key_here',
-        { expiresIn: '24h' }
+        process.env.JWT_SECRET || "your_jwt_secret_key_here",
+        { expiresIn: "24h" },
       );
 
       res.status(201).json({
@@ -103,9 +99,9 @@ router.post(
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
 /**
@@ -150,12 +146,11 @@ router.post(
  *         description: Validation error
  */
 
-
 router.post(
-  '/login',
+  "/login",
   [
-    body('email').isEmail().withMessage('Please enter a valid email'),
-    body('password').exists().withMessage('Password is required'),
+    body("email").isEmail().withMessage("Please enter a valid email"),
+    body("password").exists().withMessage("Password is required"),
   ],
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -167,25 +162,22 @@ router.post(
 
       const { email, password } = req.body;
 
-     
       const user = await User.findOne({ email });
       if (!user) {
-        res.status(400).json({ message: 'Invalid credentials' });
+        res.status(400).json({ message: "Invalid credentials" });
         return;
       }
 
-     
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
-        res.status(400).json({ message: 'Invalid credentials' });
+        res.status(400).json({ message: "Invalid credentials" });
         return;
       }
 
-     
       const token = jwt.sign(
         { _id: user._id },
-        process.env.JWT_SECRET || 'your_jwt_secret_key_here',
-        { expiresIn: '24h' }
+        process.env.JWT_SECRET || "your_jwt_secret_key_here",
+        { expiresIn: "24h" },
       );
 
       res.json({
@@ -199,9 +191,9 @@ router.post(
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
 /**
@@ -235,16 +227,21 @@ router.post(
  *         description: Invalid credentials
  */
 
-
-router.get('/me', auth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const user = await User.findById((req as any).user._id).select('-password');
-    res.json(user);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+router.get(
+  "/me",
+  auth,
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const user = await User.findById((req as any).user._id).select(
+        "-password",
+      );
+      res.json(user);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+);
 
 /**
  * @swagger
@@ -265,17 +262,15 @@ router.get('/me', auth, async (req: Request, res: Response, next: NextFunction):
  *         description: Unauthorized
  */
 
-
-
-router.get('/favorites', auth, async (req: Request, res: Response) => {
+router.get("/favorites", auth, async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user._id).populate({
-      path: 'favorites',
-      populate: { path: 'seller', select: 'name email' },
+      path: "favorites",
+      populate: { path: "seller", select: "name email" },
     });
     res.json(user?.favorites || []);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch favorites', error });
+    res.status(500).json({ message: "Failed to fetch favorites", error });
   }
 });
 
@@ -300,21 +295,20 @@ router.get('/favorites', auth, async (req: Request, res: Response) => {
  *         description: Unauthorized
  */
 
-
-router.post('/favorites/:carId', auth, async (req: Request, res: Response) => {
+router.post("/favorites/:carId", auth, async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user._id);
     const carId = req.params.carId;
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (!user) return res.status(404).json({ message: "User not found" });
     if (!user.favorites) user.favorites = [];
     if (user.favorites.includes(carId as any)) {
-      return res.status(400).json({ message: 'Car already in favorites' });
+      return res.status(400).json({ message: "Car already in favorites" });
     }
     user.favorites.push(carId as any);
     await user.save();
-    res.json({ message: 'Added to favorites' });
+    res.json({ message: "Added to favorites" });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to add favorite', error });
+    res.status(500).json({ message: "Failed to add favorite", error });
   }
 });
 
@@ -342,19 +336,24 @@ router.post('/favorites/:carId', auth, async (req: Request, res: Response) => {
  *         description: Unauthorized
  */
 
-
-router.delete('/favorites/:carId', auth, async (req: Request, res: Response) => {
-  try {
-    const user = await User.findById((req as any).user._id);
-    const carId = req.params.carId;
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    user.favorites = (user.favorites || []).filter(fav => fav.toString() !== carId);
-    await user.save();
-    res.json({ message: 'Removed from favorites' });
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to remove favorite', error });
-  }
-});
+router.delete(
+  "/favorites/:carId",
+  auth,
+  async (req: Request, res: Response) => {
+    try {
+      const user = await User.findById((req as any).user._id);
+      const carId = req.params.carId;
+      if (!user) return res.status(404).json({ message: "User not found" });
+      user.favorites = (user.favorites || []).filter(
+        (fav) => fav.toString() !== carId,
+      );
+      await user.save();
+      res.json({ message: "Removed from favorites" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove favorite", error });
+    }
+  },
+);
 
 /**
  * @swagger
@@ -378,15 +377,16 @@ router.delete('/favorites/:carId', auth, async (req: Request, res: Response) => 
  *         description: Unauthorized
  */
 
-
 router.post(
-  '/change-password',
+  "/change-password",
   auth,
   [
-    body('currentPassword').exists().withMessage('Current password is required'),
-    body('newPassword')
+    body("currentPassword")
+      .exists()
+      .withMessage("Current password is required"),
+    body("newPassword")
       .isLength({ min: 6 })
-      .withMessage('New password must be at least 6 characters long'),
+      .withMessage("New password must be at least 6 characters long"),
   ],
   async (req: Request, res: Response) => {
     try {
@@ -399,25 +399,25 @@ router.post(
       const user = await User.findById((req as any).user._id);
 
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
-     
       const isMatch = await user.comparePassword(currentPassword);
       if (!isMatch) {
-        return res.status(400).json({ message: 'Current password is incorrect' });
+        return res
+          .status(400)
+          .json({ message: "Current password is incorrect" });
       }
 
-     
       user.password = newPassword;
       await user.save();
 
-      res.json({ message: 'Password changed successfully' });
+      res.json({ message: "Password changed successfully" });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
 /**
@@ -453,14 +453,13 @@ router.post(
  *         description: User not found
  */
 
-
 router.put(
-  '/profile',
+  "/profile",
   auth,
   [
-    body('name').optional().notEmpty().withMessage('Name cannot be empty'),
-    body('phone').optional().trim(),
-    body('address').optional().trim(),
+    body("name").optional().notEmpty().withMessage("Name cannot be empty"),
+    body("phone").optional().trim(),
+    body("address").optional().trim(),
   ],
   async (req: Request, res: Response) => {
     try {
@@ -473,17 +472,15 @@ router.put(
       const user = await User.findById((req as any).user._id);
 
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
-     
       if (name !== undefined) user.name = name;
       if (phone !== undefined) user.phone = phone;
       if (address !== undefined) user.address = address;
 
       await user.save();
 
-     
       const updatedUser = {
         id: user._id,
         email: user.email,
@@ -496,9 +493,9 @@ router.put(
       res.json(updatedUser);
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'Server error' });
+      res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
 /**
@@ -550,4 +547,4 @@ router.put(
  *         description: User not found
  */
 
-export default router; 
+export default router;

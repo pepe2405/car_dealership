@@ -1,5 +1,5 @@
-import { Navigate } from 'react-router-dom';
-import authService from '../../services/authService';
+import { Navigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -20,4 +20,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, roles }) => {
   return <>{children}</>;
 };
 
-export default ProtectedRoute; 
+export default ProtectedRoute;

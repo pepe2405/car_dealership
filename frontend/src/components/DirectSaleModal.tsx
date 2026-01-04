@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { FaCar, FaUser, FaCreditCard, FaFileInvoice } from 'react-icons/fa';
-import { createSale, CreateSaleData } from '../services/salesService';
-import authService from '../services/authService';
+import React, { useState } from "react";
+import { FaCar, FaUser, FaCreditCard, FaFileInvoice } from "react-icons/fa";
+import { createSale, CreateSaleData } from "../services/salesService";
+import authService from "../services/authService";
 
 interface DirectSaleModalProps {
   isOpen: boolean;
@@ -24,12 +24,12 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
   carYear,
   onSaleCreated,
 }) => {
-  const [saleType, setSaleType] = useState<'full' | 'leasing'>('full');
+  const [saleType, setSaleType] = useState<"full" | "leasing">("full");
   const [buyerInfo, setBuyerInfo] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
   });
   const [saleDetails, setSaleDetails] = useState({
     totalAmount: carPrice,
@@ -37,42 +37,43 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
     monthlyPayment: 0,
     leaseTerm: 60,
     interestRate: 5.5,
-    notes: '',
+    notes: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const currentUser = authService.getCurrentUser();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    if (name.startsWith('buyer.')) {
-      const field = name.split('.')[1];
-      setBuyerInfo(prev => ({ ...prev, [field]: value }));
+    if (name.startsWith("buyer.")) {
+      const field = name.split(".")[1];
+      setBuyerInfo((prev) => ({ ...prev, [field]: value }));
     } else {
-      setSaleDetails(prev => ({ ...prev, [name]: value }));
+      setSaleDetails((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSaleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const type = e.target.value as 'full' | 'leasing';
+    const type = e.target.value as "full" | "leasing";
     setSaleType(type);
-    
-    if (type === 'full') {
-      setSaleDetails(prev => ({
+
+    if (type === "full") {
+      setSaleDetails((prev) => ({
         ...prev,
         totalAmount: carPrice,
         downPayment: 0,
         monthlyPayment: 0,
       }));
     } else {
-     
       const downPayment = carPrice * 0.2;
       const remainingAmount = carPrice - downPayment;
       const monthlyPayment = (remainingAmount * (1 + 0.055 * 5)) / 60;
-      
-      setSaleDetails(prev => ({
+
+      setSaleDetails((prev) => ({
         ...prev,
         totalAmount: carPrice,
         downPayment,
@@ -84,35 +85,37 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const token = authService.getToken();
       if (!token) {
-        throw new Error('Не сте влезли в профила си.');
+        throw new Error("Не сте влезли в профила си.");
       }
 
-     
       if (!buyerInfo.name || !buyerInfo.email) {
-        throw new Error('Името и имейлът на купувача са задължителни.');
+        throw new Error("Името и имейлът на купувача са задължителни.");
       }
 
-      if (saleType === 'leasing' && (!saleDetails.downPayment || !saleDetails.monthlyPayment)) {
-        throw new Error('За лизинг са необходими първоначална вноска и месечна вноска.');
+      if (
+        saleType === "leasing" &&
+        (!saleDetails.downPayment || !saleDetails.monthlyPayment)
+      ) {
+        throw new Error(
+          "За лизинг са необходими първоначална вноска и месечна вноска.",
+        );
       }
 
-     
       const saleData: CreateSaleData = {
         carId,
-        buyerId: currentUser?.id || '',
+        buyerId: currentUser?.id || "",
         saleType,
         totalAmount: saleDetails.totalAmount,
         notes: saleDetails.notes,
       };
 
-     
-      if (saleType === 'leasing') {
+      if (saleType === "leasing") {
         saleData.downPayment = saleDetails.downPayment;
         saleData.monthlyPayment = saleDetails.monthlyPayment;
         saleData.leaseTerm = saleDetails.leaseTerm;
@@ -120,17 +123,15 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
       }
 
       const result = await createSale(saleData, token);
-      
-      setSuccess('Продажбата е създадена успешно!');
-      
-     
+
+      setSuccess("Продажбата е създадена успешно!");
+
       setTimeout(() => {
         onSaleCreated();
         onClose();
       }, 2000);
-
     } catch (err: any) {
-      setError(err.message || 'Грешка при създаване на продажбата.');
+      setError(err.message || "Грешка при създаване на продажбата.");
     } finally {
       setLoading(false);
     }
@@ -165,7 +166,7 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
               {error}
             </div>
           )}
-          
+
           {success && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
               {success}
@@ -253,7 +254,7 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
               <FaCreditCard className="text-primary-500" />
               Детайли на продажбата
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -269,7 +270,7 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
                 />
               </div>
 
-              {saleType === 'leasing' && (
+              {saleType === "leasing" && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -354,27 +355,35 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Автомобил:</span>
-                <span className="font-medium">{carBrand} {carModel} ({carYear})</span>
+                <span className="font-medium">
+                  {carBrand} {carModel} ({carYear})
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Тип продажба:</span>
                 <span className="font-medium">
-                  {saleType === 'full' ? 'Пълна покупка' : 'Лизинг'}
+                  {saleType === "full" ? "Пълна покупка" : "Лизинг"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Обща сума:</span>
-                <span className="font-medium">${saleDetails.totalAmount.toLocaleString()}</span>
+                <span className="font-medium">
+                  ${saleDetails.totalAmount.toLocaleString()}
+                </span>
               </div>
-              {saleType === 'leasing' && (
+              {saleType === "leasing" && (
                 <>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Първоначална вноска:</span>
-                    <span className="font-medium">${saleDetails.downPayment.toLocaleString()}</span>
+                    <span className="font-medium">
+                      ${saleDetails.downPayment.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Месечна вноска:</span>
-                    <span className="font-medium">${saleDetails.monthlyPayment.toLocaleString()}</span>
+                    <span className="font-medium">
+                      ${saleDetails.monthlyPayment.toLocaleString()}
+                    </span>
                   </div>
                 </>
               )}
@@ -414,4 +423,4 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
   );
 };
 
-export default DirectSaleModal; 
+export default DirectSaleModal;

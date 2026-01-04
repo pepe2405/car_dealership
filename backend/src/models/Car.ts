@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface ICar extends Document {
   brand: string;
@@ -12,7 +12,7 @@ export interface ICar extends Document {
   description: string;
   features: string[];
   seller: mongoose.Types.ObjectId;
-  status: 'available' | 'sold' | 'reserved';
+  status: "available" | "sold" | "reserved";
   location?: {
     city: string;
     state: string;
@@ -53,35 +53,39 @@ const carSchema = new Schema<ICar>(
     fuelType: {
       type: String,
       required: true,
-      enum: ['petrol', 'diesel', 'electric', 'hybrid'],
+      enum: ["petrol", "diesel", "electric", "hybrid"],
     },
     transmission: {
       type: String,
       required: true,
-      enum: ['manual', 'automatic'],
+      enum: ["manual", "automatic"],
     },
-    images: [{
-      type: String,
-      required: true,
-    }],
+    images: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     description: {
       type: String,
       required: true,
       trim: true,
     },
-    features: [{
-      type: String,
-      trim: true,
-    }],
+    features: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
     seller: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     status: {
       type: String,
-      enum: ['available', 'sold', 'reserved'],
-      default: 'available',
+      enum: ["available", "sold", "reserved"],
+      default: "available",
     },
     location: {
       city: {
@@ -100,9 +104,8 @@ const carSchema = new Schema<ICar>(
   },
   {
     timestamps: true,
-  }
+  },
 );
-
 
 carSchema.index({ brand: 1, carModel: 1 });
 carSchema.index({ price: 1 });
@@ -110,4 +113,4 @@ carSchema.index({ year: 1 });
 carSchema.index({ status: 1 });
 carSchema.index({ seller: 1 });
 
-export const Car = mongoose.model<ICar>('Car', carSchema); 
+export const Car = mongoose.model<ICar>("Car", carSchema);

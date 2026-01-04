@@ -1,16 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
-
-const API_URL = '/api/deposits';
-
+const API_URL = "/api/deposits";
 
 axios.defaults.withCredentials = true;
-
 
 const api = axios.create({
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -30,14 +27,14 @@ export interface AdminDeposit {
     email: string;
   };
   amount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: "pending" | "approved" | "rejected" | "refunded";
   notes?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UpdateDepositData {
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: "pending" | "approved" | "rejected" | "refunded";
   notes?: string;
 }
 
@@ -46,7 +43,7 @@ export interface UpdateDepositData {
  */
 export async function fetchAllDeposits(token: string): Promise<AdminDeposit[]> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.get(`${API_URL}/admin/all`, {
@@ -58,13 +55,17 @@ export async function fetchAllDeposits(token: string): Promise<AdminDeposit[]> {
 /**
  * Update deposit status (admin only)
  */
-export async function updateDepositStatus(depositId: string, data: UpdateDepositData, token: string): Promise<{ message: string; deposit: AdminDeposit }> {
+export async function updateDepositStatus(
+  depositId: string,
+  data: UpdateDepositData,
+  token: string,
+): Promise<{ message: string; deposit: AdminDeposit }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.put(`${API_URL}/${depositId}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
-} 
+}

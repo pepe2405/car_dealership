@@ -1,16 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
-
-const API_URL = '/api/cars';
-
+const API_URL = "/api/cars";
 
 axios.defaults.withCredentials = true;
-
 
 const api = axios.create({
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -39,13 +36,11 @@ export interface Car {
 
 export async function fetchCars(token?: string): Promise<Car[]> {
   if (token) {
-   
     const response = await api.get(`${API_URL}/authenticated`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   } else {
-   
     const response = await api.get(API_URL);
     return response.data;
   }
@@ -68,7 +63,11 @@ export async function fetchMyCars(token: string): Promise<Car[]> {
   return response.data;
 }
 
-export async function updateCar(id: string, data: Partial<Car>, token: string): Promise<Car> {
+export async function updateCar(
+  id: string,
+  data: Partial<Car>,
+  token: string,
+): Promise<Car> {
   const response = await api.put(`${API_URL}/${id}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -83,21 +82,28 @@ export async function deleteCar(id: string, token: string): Promise<void> {
 
 export async function addFavorite(carId: string, token: string): Promise<void> {
   if (!token) {
-    console.error('No token provided to addFavorite!');
-    throw new Error('Не сте влезли в профила си.');
+    console.error("No token provided to addFavorite!");
+    throw new Error("Не сте влезли в профила си.");
   }
-  console.debug('addFavorite token:', token);
-  await api.post(`/api/auth/favorites/${carId}`, {}, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  console.debug("addFavorite token:", token);
+  await api.post(
+    `/api/auth/favorites/${carId}`,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    },
+  );
 }
 
-export async function removeFavorite(carId: string, token: string): Promise<void> {
+export async function removeFavorite(
+  carId: string,
+  token: string,
+): Promise<void> {
   if (!token) {
-    console.error('No token provided to removeFavorite!');
-    throw new Error('Не сте влезли в профила си.');
+    console.error("No token provided to removeFavorite!");
+    throw new Error("Не сте влезли в профила си.");
   }
-  console.debug('removeFavorite token:', token);
+  console.debug("removeFavorite token:", token);
   await api.delete(`/api/auth/favorites/${carId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -105,11 +111,11 @@ export async function removeFavorite(carId: string, token: string): Promise<void
 
 export async function fetchFavorites(token: string): Promise<Car[]> {
   if (!token) {
-    console.error('No token provided to fetchFavorites!');
-    throw new Error('Не сте влезли в профила си.');
+    console.error("No token provided to fetchFavorites!");
+    throw new Error("Не сте влезли в профила си.");
   }
-  console.debug('fetchFavorites token:', token);
-  const response = await api.get('/api/auth/favorites', {
+  console.debug("fetchFavorites token:", token);
+  const response = await api.get("/api/auth/favorites", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -120,11 +126,11 @@ export async function fetchFavorites(token: string): Promise<Car[]> {
  */
 export async function fetchAllCars(token: string): Promise<Car[]> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
-  const response = await api.get('/all', {
+  const response = await api.get("/all", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
-} 
+}

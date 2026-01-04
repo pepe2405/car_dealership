@@ -1,34 +1,48 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaCar, FaUser, FaShoppingCart, FaFileInvoice, FaCalendarAlt, FaDollarSign, FaEdit, FaKey } from 'react-icons/fa';
-import authService from '../services/authService';
-import { fetchSales, Sale } from '../services/salesService';
-import { fetchUserDeposits, Deposit } from '../services/depositsService';
-import { getProfile, updateProfile, UserProfile } from '../services/userService';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaCar,
+  FaUser,
+  FaShoppingCart,
+  FaFileInvoice,
+  FaCalendarAlt,
+  FaDollarSign,
+  FaEdit,
+  FaKey,
+} from "react-icons/fa";
+import authService from "../services/authService";
+import { fetchSales, Sale } from "../services/salesService";
+import { fetchUserDeposits, Deposit } from "../services/depositsService";
+import {
+  getProfile,
+  updateProfile,
+  UserProfile,
+} from "../services/userService";
 
 const Profile = () => {
   const [user, setUser] = useState<any>(null);
   const [sales, setSales] = useState<Sale[]>([]);
   const [deposits, setDeposits] = useState<Deposit[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  
- 
+  const [error, setError] = useState("");
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [form, setForm] = useState<Partial<UserProfile>>({});
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState<'profile' | 'password' | 'sales' | 'deposits'>('profile');
+  const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "password" | "sales" | "deposits"
+  >("profile");
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     if (!currentUser) {
-      setError('Не сте влезли в профила си.');
+      setError("Не сте влезли в профила си.");
       setLoading(false);
       return;
     }
@@ -42,19 +56,18 @@ const Profile = () => {
     try {
       const token = authService.getToken();
       if (!token) {
-        throw new Error('Не сте влезни в профила си.');
+        throw new Error("Не сте влезни в профила си.");
       }
 
-     
       const [salesData, depositsData] = await Promise.all([
         fetchSales(token).catch(() => []),
-        fetchUserDeposits(token).catch(() => [])
+        fetchUserDeposits(token).catch(() => []),
       ]);
 
       setSales(salesData);
       setDeposits(depositsData);
     } catch (err: any) {
-      setError(err.message || 'Грешка при зареждане на данните.');
+      setError(err.message || "Грешка при зареждане на данните.");
     } finally {
       setLoading(false);
     }
@@ -63,44 +76,46 @@ const Profile = () => {
   const loadProfileData = async () => {
     try {
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       const data = await getProfile(token);
       setProfile(data);
       setForm({
         name: data.name,
-        phone: data.phone || '',
-        address: data.address || '',
+        phone: data.phone || "",
+        address: data.address || "",
       });
     } catch (err: any) {
-      console.error('Failed to load profile:', err);
+      console.error("Failed to load profile:", err);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswordForm({ ...passwordForm, [e.target.name]: e.target.value });
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     try {
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       const updated = await updateProfile(token, form);
       setProfile(updated);
-      setSuccess('Профилът е обновен успешно!');
+      setSuccess("Профилът е обновен успешно!");
     } catch (err: any) {
-      setError('Грешка при обновяване на профила');
+      setError("Грешка при обновяване на профила");
     } finally {
       setSaving(false);
     }
@@ -109,24 +124,28 @@ const Profile = () => {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      setError('Новите пароли не съвпадат');
+      setError("Новите пароли не съвпадат");
       return;
     }
     setSaving(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
     try {
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
-      await authService.changePassword(token, passwordForm.currentPassword, passwordForm.newPassword);
-      setSuccess('Паролата е променена успешно!');
+      if (!token) throw new Error("Not authenticated");
+      await authService.changePassword(
+        token,
+        passwordForm.currentPassword,
+        passwordForm.newPassword,
+      );
+      setSuccess("Паролата е променена успешно!");
       setPasswordForm({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       });
     } catch (err: any) {
-      setError('Грешка при промяна на паролата');
+      setError("Грешка при промяна на паролата");
     } finally {
       setSaving(false);
     }
@@ -134,27 +153,27 @@ const Profile = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
+      case "cancelled":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'pending':
-        return 'Изчаква';
-      case 'completed':
-        return 'Завършена';
-      case 'cancelled':
-        return 'Отменена';
+      case "pending":
+        return "Изчаква";
+      case "completed":
+        return "Завършена";
+      case "cancelled":
+        return "Отменена";
       default:
-        return 'Неизвестен';
+        return "Неизвестен";
     }
   };
 
@@ -201,7 +220,12 @@ const Profile = () => {
                   {user?.name} ({user?.email})
                 </p>
                 <p className="text-primary-200 text-sm mt-1">
-                  Роля: {user?.role === 'admin' ? 'Администратор' : user?.role === 'seller' ? 'Продавач' : 'Купувач'}
+                  Роля:{" "}
+                  {user?.role === "admin"
+                    ? "Администратор"
+                    : user?.role === "seller"
+                      ? "Продавач"
+                      : "Купувач"}
                 </p>
               </div>
             </div>
@@ -217,13 +241,15 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">
-                  {user?.role === 'buyer' ? 'Общо покупки' : 'Общо продажби'}
+                  {user?.role === "buyer" ? "Общо покупки" : "Общо продажби"}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{sales.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {sales.length}
+                </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center gap-4">
               <div className="bg-green-100 rounded-full p-3">
@@ -231,15 +257,17 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">
-                  {user?.role === 'buyer' ? 'Завършени покупки' : 'Завършени продажби'}
+                  {user?.role === "buyer"
+                    ? "Завършени покупки"
+                    : "Завършени продажби"}
                 </p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {sales.filter(sale => sale.status === 'completed').length}
+                  {sales.filter((sale) => sale.status === "completed").length}
                 </p>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <div className="flex items-center gap-4">
               <div className="bg-yellow-100 rounded-full p-3">
@@ -247,9 +275,11 @@ const Profile = () => {
               </div>
               <div>
                 <p className="text-sm text-gray-600">
-                  {user?.role === 'buyer' ? 'Моите депозити' : 'Депозити'}
+                  {user?.role === "buyer" ? "Моите депозити" : "Депозити"}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{deposits.length}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {deposits.length}
+                </p>
               </div>
             </div>
           </div>
@@ -272,44 +302,44 @@ const Profile = () => {
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
               <button
-                onClick={() => setActiveTab('profile')}
+                onClick={() => setActiveTab("profile")}
                 className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                  activeTab === 'profile'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "profile"
+                    ? "border-primary-500 text-primary-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 <FaEdit className="inline mr-2" />
                 Профил
               </button>
               <button
-                onClick={() => setActiveTab('password')}
+                onClick={() => setActiveTab("password")}
                 className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                  activeTab === 'password'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "password"
+                    ? "border-primary-500 text-primary-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 <FaKey className="inline mr-2" />
                 Парола
               </button>
               <button
-                onClick={() => setActiveTab('sales')}
+                onClick={() => setActiveTab("sales")}
                 className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                  activeTab === 'sales'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "sales"
+                    ? "border-primary-500 text-primary-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 <FaShoppingCart className="inline mr-2" />
-                {user?.role === 'buyer' ? 'Покупки' : 'Продажби'}
+                {user?.role === "buyer" ? "Покупки" : "Продажби"}
               </button>
               <button
-                onClick={() => setActiveTab('deposits')}
+                onClick={() => setActiveTab("deposits")}
                 className={`flex-1 py-4 px-6 text-center border-b-2 font-medium text-sm ${
-                  activeTab === 'deposits'
-                    ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  activeTab === "deposits"
+                    ? "border-primary-500 text-primary-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 <FaCar className="inline mr-2" />
@@ -324,8 +354,16 @@ const Profile = () => {
               <div className="mb-6 bg-green-50 border-l-4 border-green-400 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-green-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div className="ml-3">
@@ -339,8 +377,16 @@ const Profile = () => {
               <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    <svg
+                      className="h-5 w-5 text-red-400"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
                     </svg>
                   </div>
                   <div className="ml-3">
@@ -351,21 +397,25 @@ const Profile = () => {
             )}
 
             {/* Profile Tab */}
-            {activeTab === 'profile' && profile && (
+            {activeTab === "profile" && profile && (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Име</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Име
+                    </label>
                     <input
                       name="name"
-                      value={form.name || ''}
+                      value={form.name || ""}
                       onChange={handleChange}
                       required
                       className="mt-1 input"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Имейл</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Имейл
+                    </label>
                     <input
                       name="email"
                       value={profile.email}
@@ -374,25 +424,32 @@ const Profile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Роля</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Роля
+                    </label>
                     <div className="mt-1 px-3 py-2 bg-gray-50 rounded-md border border-gray-300 text-gray-700">
-                      {profile.role.charAt(0).toUpperCase() + profile.role.slice(1)}
+                      {profile.role.charAt(0).toUpperCase() +
+                        profile.role.slice(1)}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Телефон</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Телефон
+                    </label>
                     <input
                       name="phone"
-                      value={form.phone || ''}
+                      value={form.phone || ""}
                       onChange={handleChange}
                       className="mt-1 input"
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Адрес</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Адрес
+                    </label>
                     <input
                       name="address"
-                      value={form.address || ''}
+                      value={form.address || ""}
                       onChange={handleChange}
                       className="mt-1 input"
                     />
@@ -404,18 +461,20 @@ const Profile = () => {
                     disabled={saving}
                     className="btn-primary"
                   >
-                    {saving ? 'Запазване...' : 'Запази промените'}
+                    {saving ? "Запазване..." : "Запази промените"}
                   </button>
                 </div>
               </form>
             )}
 
             {/* Password Tab */}
-            {activeTab === 'password' && (
+            {activeTab === "password" && (
               <form onSubmit={handlePasswordSubmit} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Текуща парола</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Текуща парола
+                    </label>
                     <input
                       type="password"
                       name="currentPassword"
@@ -426,7 +485,9 @@ const Profile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Нова парола</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Нова парола
+                    </label>
                     <input
                       type="password"
                       name="newPassword"
@@ -438,7 +499,9 @@ const Profile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Потвърди нова парола</label>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Потвърди нова парола
+                    </label>
                     <input
                       type="password"
                       name="confirmPassword"
@@ -456,45 +519,55 @@ const Profile = () => {
                     disabled={saving}
                     className="btn-primary"
                   >
-                    {saving ? 'Промяна на парола...' : 'Промени парола'}
+                    {saving ? "Промяна на парола..." : "Промени парола"}
                   </button>
                 </div>
               </form>
             )}
 
             {/* Sales Tab */}
-            {activeTab === 'sales' && (
+            {activeTab === "sales" && (
               <div>
                 {sales.length === 0 ? (
                   <div className="text-center py-8">
                     <FaShoppingCart className="text-4xl text-gray-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      {user?.role === 'buyer' ? 'Няма покупки' : 'Няма продажби'}
+                      {user?.role === "buyer"
+                        ? "Няма покупки"
+                        : "Няма продажби"}
                     </h3>
                     <p className="text-gray-600">
-                      {user?.role === 'buyer' 
-                        ? 'Все още не сте направили покупки.' 
-                        : 'Все още не сте направили продажби.'
-                      }
+                      {user?.role === "buyer"
+                        ? "Все още не сте направили покупки."
+                        : "Все още не сте направили продажби."}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {sales.map((sale) => (
-                      <div key={sale._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div
+                        key={sale._id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <img
-                              src={sale.carId.images?.[0] || 'https://via.placeholder.com/60x40?text=No+Image'}
-                              alt={sale.carId.brand + ' ' + sale.carId.carModel}
+                              src={
+                                sale.carId.images?.[0] ||
+                                "https://via.placeholder.com/60x40?text=No+Image"
+                              }
+                              alt={sale.carId.brand + " " + sale.carId.carModel}
                               className="w-15 h-10 object-cover rounded"
                             />
                             <div>
                               <h3 className="font-semibold text-gray-900">
-                                {sale.carId.brand} {sale.carId.carModel} ({sale.carId.year})
+                                {sale.carId.brand} {sale.carId.carModel} (
+                                {sale.carId.year})
                               </h3>
                               <p className="text-sm text-gray-600">
-                                {sale.saleType === 'full' ? 'Пълна покупка' : 'Лизинг'}
+                                {sale.saleType === "full"
+                                  ? "Пълна покупка"
+                                  : "Лизинг"}
                               </p>
                             </div>
                           </div>
@@ -502,43 +575,54 @@ const Profile = () => {
                             <p className="font-bold text-lg text-primary-600">
                               ${sale.totalAmount.toLocaleString()}
                             </p>
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(sale.status)}`}>
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(sale.status)}`}
+                            >
                               {getStatusText(sale.status)}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <FaUser className="text-gray-400" />
                             <span>
-                              {user?.role === 'buyer' 
-                                ? `Продавач: ${sale.sellerId?.name || 'Н/А'}` 
-                                : `Купувач: ${sale.buyerId.name}`
-                              }
+                              {user?.role === "buyer"
+                                ? `Продавач: ${sale.sellerId?.name || "Н/А"}`
+                                : `Купувач: ${sale.buyerId.name}`}
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
                             <FaCalendarAlt className="text-gray-400" />
-                            <span>Дата: {new Date(sale.saleDate).toLocaleDateString('bg')}</span>
+                            <span>
+                              Дата:{" "}
+                              {new Date(sale.saleDate).toLocaleDateString("bg")}
+                            </span>
                           </div>
-                          {sale.saleType === 'leasing' && (
+                          {sale.saleType === "leasing" && (
                             <>
                               <div className="flex items-center gap-1">
                                 <FaDollarSign className="text-gray-400" />
-                                <span>Вноска: ${sale.downPayment?.toLocaleString()}</span>
+                                <span>
+                                  Вноска: ${sale.downPayment?.toLocaleString()}
+                                </span>
                               </div>
                               <div className="flex items-center gap-1">
                                 <FaDollarSign className="text-gray-400" />
-                                <span>Месечно: ${sale.monthlyPayment?.toLocaleString()}</span>
+                                <span>
+                                  Месечно: $
+                                  {sale.monthlyPayment?.toLocaleString()}
+                                </span>
                               </div>
                             </>
                           )}
                         </div>
-                        
+
                         {sale.notes && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-700 italic">"{sale.notes}"</p>
+                            <p className="text-sm text-gray-700 italic">
+                              "{sale.notes}"
+                            </p>
                           </div>
                         )}
                       </div>
@@ -549,28 +633,44 @@ const Profile = () => {
             )}
 
             {/* Deposits Tab */}
-            {activeTab === 'deposits' && (
+            {activeTab === "deposits" && (
               <div>
                 {deposits.length === 0 ? (
                   <div className="text-center py-8">
                     <FaCar className="text-4xl text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">Няма депозити</h3>
-                    <p className="text-gray-600">Все още не сте направили депозити.</p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      Няма депозити
+                    </h3>
+                    <p className="text-gray-600">
+                      Все още не сте направили депозити.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {deposits.map((deposit) => (
-                      <div key={deposit._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div
+                        key={deposit._id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <img
-                              src={deposit.listingId.images?.[0] || 'https://via.placeholder.com/60x40?text=No+Image'}
-                              alt={deposit.listingId.brand + ' ' + deposit.listingId.carModel}
+                              src={
+                                deposit.listingId.images?.[0] ||
+                                "https://via.placeholder.com/60x40?text=No+Image"
+                              }
+                              alt={
+                                deposit.listingId.brand +
+                                " " +
+                                deposit.listingId.carModel
+                              }
                               className="w-15 h-10 object-cover rounded"
                             />
                             <div>
                               <h3 className="font-semibold text-gray-900">
-                                {deposit.listingId.brand} {deposit.listingId.carModel} ({deposit.listingId.year})
+                                {deposit.listingId.brand}{" "}
+                                {deposit.listingId.carModel} (
+                                {deposit.listingId.year})
                               </h3>
                               <p className="text-sm text-gray-600">
                                 Депозит: ${deposit.amount.toLocaleString()}
@@ -578,26 +678,38 @@ const Profile = () => {
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(deposit.status)}`}>
+                            <span
+                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(deposit.status)}`}
+                            >
                               {getStatusText(deposit.status)}
                             </span>
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <FaCalendarAlt className="text-gray-400" />
-                            <span>Дата: {new Date(deposit.createdAt).toLocaleDateString('bg')}</span>
+                            <span>
+                              Дата:{" "}
+                              {new Date(deposit.createdAt).toLocaleDateString(
+                                "bg",
+                              )}
+                            </span>
                           </div>
                           <div className="flex items-center gap-1">
                             <FaDollarSign className="text-gray-400" />
-                            <span>Цена на колата: ${deposit.listingId.price.toLocaleString()}</span>
+                            <span>
+                              Цена на колата: $
+                              {deposit.listingId.price.toLocaleString()}
+                            </span>
                           </div>
                         </div>
-                        
+
                         {deposit.notes && (
                           <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <p className="text-sm text-gray-700 italic">"{deposit.notes}"</p>
+                            <p className="text-sm text-gray-700 italic">
+                              "{deposit.notes}"
+                            </p>
                           </div>
                         )}
                       </div>
@@ -613,4 +725,4 @@ const Profile = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

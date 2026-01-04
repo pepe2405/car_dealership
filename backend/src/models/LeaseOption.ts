@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface ILeaseOption extends Document {
   name: string;
@@ -10,36 +10,39 @@ export interface ILeaseOption extends Document {
   updatedAt: Date;
 }
 
-const LeaseOptionSchema = new Schema<ILeaseOption>({
-  name: { 
-    type: String, 
-    required: true,
-    unique: true 
+const LeaseOptionSchema = new Schema<ILeaseOption>(
+  {
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    duration: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 60,
+    },
+    downPayment: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+    },
+    interestRate: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 100,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  duration: { 
-    type: Number, 
-    required: true,
-    min: 1,
-    max: 60 
+  {
+    timestamps: true,
   },
-  downPayment: { 
-    type: Number, 
-    required: true,
-    min: 0,
-    max: 100 
-  },
-  interestRate: { 
-    type: Number, 
-    required: true,
-    min: 0,
-    max: 100 
-  },
-  isActive: { 
-    type: Boolean, 
-    default: true 
-  }
-}, {
-  timestamps: true
-});
+);
 
-export default mongoose.model<ILeaseOption>('LeaseOption', LeaseOptionSchema); 
+export default mongoose.model<ILeaseOption>("LeaseOption", LeaseOptionSchema);

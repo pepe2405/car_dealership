@@ -1,7 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = '/api';
-
+const API_URL = "/api";
 
 axios.defaults.withCredentials = true;
 
@@ -23,15 +22,14 @@ export const getProfile = async (token: string): Promise<UserProfile> => {
   return response.data;
 };
 
-export const updateProfile = async (token: string, profileData: Partial<UserProfile>): Promise<UserProfile> => {
-  const response = await axios.put(
-    `${API_URL}/auth/profile`,
-    profileData,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+export const updateProfile = async (
+  token: string,
+  profileData: Partial<UserProfile>,
+): Promise<UserProfile> => {
+  const response = await axios.put(`${API_URL}/auth/profile`, profileData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
-}; 
+};

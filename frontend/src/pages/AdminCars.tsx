@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Car } from '../services/carService';
-import authService from '../services/authService';
-import { getAllCars, updateCar, deleteCar } from '../services/adminService';
+import { useEffect, useState } from "react";
+import { Car } from "../services/carService";
+import authService from "../services/authService";
+import { getAllCars, updateCar, deleteCar } from "../services/adminService";
 
 interface CarWithId extends Car {
   _id: string;
@@ -10,11 +10,11 @@ interface CarWithId extends Car {
 const AdminCars = () => {
   const [cars, setCars] = useState<CarWithId[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [editingCar, setEditingCar] = useState<CarWithId | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchCars();
@@ -23,14 +23,14 @@ const AdminCars = () => {
   const fetchCars = async () => {
     try {
       setLoading(true);
-      setError('');
+      setError("");
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       const data = await getAllCars(token);
       setCars(data);
     } catch (err: any) {
-      setError('Failed to load cars');
-      console.error('Error fetching cars:', err);
+      setError("Failed to load cars");
+      console.error("Error fetching cars:", err);
     } finally {
       setLoading(false);
     }
@@ -43,42 +43,42 @@ const AdminCars = () => {
   const handleSave = async () => {
     if (!editingCar) return;
     try {
-      setError('');
-      setSuccess('');
+      setError("");
+      setSuccess("");
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       await updateCar(token, editingCar._id, editingCar);
-      setCars(cars.map(c => c._id === editingCar._id ? editingCar : c));
+      setCars(cars.map((c) => (c._id === editingCar._id ? editingCar : c)));
       setEditingCar(null);
-      setSuccess('Car updated successfully');
+      setSuccess("Car updated successfully");
     } catch (err: any) {
-      setError('Failed to update car');
-      console.error('Error updating car:', err);
+      setError("Failed to update car");
+      console.error("Error updating car:", err);
     }
   };
 
   const handleDelete = async (carId: string) => {
-    if (!window.confirm('Are you sure you want to delete this car?')) return;
+    if (!window.confirm("Are you sure you want to delete this car?")) return;
     try {
-      setError('');
-      setSuccess('');
+      setError("");
+      setSuccess("");
       const token = authService.getToken();
-      if (!token) throw new Error('Not authenticated');
+      if (!token) throw new Error("Not authenticated");
       await deleteCar(token, carId);
-      setCars(cars.filter(c => c._id !== carId));
-      setSuccess('Car deleted successfully');
+      setCars(cars.filter((c) => c._id !== carId));
+      setSuccess("Car deleted successfully");
     } catch (err: any) {
-      setError('Failed to delete car');
-      console.error('Error deleting car:', err);
+      setError("Failed to delete car");
+      console.error("Error deleting car:", err);
     }
   };
 
-  const filteredCars = cars.filter(car => {
-    const matchesSearch = 
+  const filteredCars = cars.filter((car) => {
+    const matchesSearch =
       car.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.carModel.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || car.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || car.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -100,8 +100,12 @@ const AdminCars = () => {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-8">
-            <h1 className="text-3xl font-bold text-white">Car Listings Management</h1>
-            <p className="mt-2 text-primary-100">Manage and moderate car listings</p>
+            <h1 className="text-3xl font-bold text-white">
+              Car Listings Management
+            </h1>
+            <p className="mt-2 text-primary-100">
+              Manage and moderate car listings
+            </p>
           </div>
 
           {/* Filters */}
@@ -148,11 +152,21 @@ const AdminCars = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Car</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Seller</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Car
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Price
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Seller
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -165,14 +179,24 @@ const AdminCars = () => {
                             <input
                               type="text"
                               value={editingCar.brand}
-                              onChange={(e) => setEditingCar({ ...editingCar, brand: e.target.value })}
+                              onChange={(e) =>
+                                setEditingCar({
+                                  ...editingCar,
+                                  brand: e.target.value,
+                                })
+                              }
                               placeholder="Brand"
                               className="input flex-1"
                             />
                             <input
                               type="text"
                               value={editingCar.carModel}
-                              onChange={(e) => setEditingCar({ ...editingCar, carModel: e.target.value })}
+                              onChange={(e) =>
+                                setEditingCar({
+                                  ...editingCar,
+                                  carModel: e.target.value,
+                                })
+                              }
                               placeholder="Model"
                               className="input flex-1"
                             />
@@ -181,14 +205,24 @@ const AdminCars = () => {
                             <input
                               type="number"
                               value={editingCar.year}
-                              onChange={(e) => setEditingCar({ ...editingCar, year: parseInt(e.target.value) })}
+                              onChange={(e) =>
+                                setEditingCar({
+                                  ...editingCar,
+                                  year: parseInt(e.target.value),
+                                })
+                              }
                               placeholder="Year"
                               className="input flex-1"
                             />
                             <input
                               type="number"
                               value={editingCar.price}
-                              onChange={(e) => setEditingCar({ ...editingCar, price: parseFloat(e.target.value) })}
+                              onChange={(e) =>
+                                setEditingCar({
+                                  ...editingCar,
+                                  price: parseFloat(e.target.value),
+                                })
+                              }
                               placeholder="Price"
                               className="input flex-1"
                             />
@@ -197,13 +231,23 @@ const AdminCars = () => {
                             <input
                               type="number"
                               value={editingCar.mileage}
-                              onChange={(e) => setEditingCar({ ...editingCar, mileage: parseInt(e.target.value) })}
+                              onChange={(e) =>
+                                setEditingCar({
+                                  ...editingCar,
+                                  mileage: parseInt(e.target.value),
+                                })
+                              }
                               placeholder="Mileage"
                               className="input flex-1"
                             />
                             <select
                               value={editingCar.status}
-                              onChange={(e) => setEditingCar({ ...editingCar, status: e.target.value })}
+                              onChange={(e) =>
+                                setEditingCar({
+                                  ...editingCar,
+                                  status: e.target.value,
+                                })
+                              }
                               className="input flex-1"
                             >
                               <option value="available">Available</option>
@@ -235,18 +279,31 @@ const AdminCars = () => {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">${car.price.toLocaleString()}</div>
+                      <div className="text-sm text-gray-900">
+                        ${car.price.toLocaleString()}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{car.seller?.name || 'Unknown'}</div>
-                      <div className="text-sm text-gray-500">{car.seller?.email || ''}</div>
+                      <div className="text-sm text-gray-900">
+                        {car.seller?.name || "Unknown"}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {car.seller?.email || ""}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${car.status === 'available' ? 'bg-green-100 text-green-800' : 
-                          car.status === 'sold' ? 'bg-red-100 text-red-800' : 
-                          'bg-yellow-100 text-yellow-800'}`}>
-                        {car.status.charAt(0).toUpperCase() + car.status.slice(1)}
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${
+                          car.status === "available"
+                            ? "bg-green-100 text-green-800"
+                            : car.status === "sold"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {car.status.charAt(0).toUpperCase() +
+                          car.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -293,4 +350,4 @@ const AdminCars = () => {
   );
 };
 
-export default AdminCars; 
+export default AdminCars;

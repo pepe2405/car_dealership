@@ -1,16 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
-
-const API_URL = '/api/deposits';
-
+const API_URL = "/api/deposits";
 
 axios.defaults.withCredentials = true;
-
 
 const api = axios.create({
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -30,7 +27,7 @@ export interface OwnerDeposit {
     email: string;
   };
   amount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: "pending" | "approved" | "rejected" | "refunded";
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -43,9 +40,11 @@ export interface UpdateDepositData {
 /**
  * Get deposits for cars owned by the current user
  */
-export async function fetchOwnerDeposits(token: string): Promise<OwnerDeposit[]> {
+export async function fetchOwnerDeposits(
+  token: string,
+): Promise<OwnerDeposit[]> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.get(`${API_URL}/owner/cars`, {
@@ -57,9 +56,13 @@ export async function fetchOwnerDeposits(token: string): Promise<OwnerDeposit[]>
 /**
  * Approve deposit by car owner
  */
-export async function approveDeposit(depositId: string, data: UpdateDepositData, token: string): Promise<{ message: string; deposit: OwnerDeposit }> {
+export async function approveDeposit(
+  depositId: string,
+  data: UpdateDepositData,
+  token: string,
+): Promise<{ message: string; deposit: OwnerDeposit }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.put(`${API_URL}/${depositId}/approve`, data, {
@@ -71,13 +74,17 @@ export async function approveDeposit(depositId: string, data: UpdateDepositData,
 /**
  * Reject deposit by car owner
  */
-export async function rejectDeposit(depositId: string, data: UpdateDepositData, token: string): Promise<{ message: string; deposit: OwnerDeposit }> {
+export async function rejectDeposit(
+  depositId: string,
+  data: UpdateDepositData,
+  token: string,
+): Promise<{ message: string; deposit: OwnerDeposit }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.put(`${API_URL}/${depositId}/reject`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
-} 
+}

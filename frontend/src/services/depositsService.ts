@@ -1,16 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
-
-const API_URL = '/api/deposits';
-
+const API_URL = "/api/deposits";
 
 axios.defaults.withCredentials = true;
-
 
 const api = axios.create({
   withCredentials: true,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -30,7 +27,7 @@ export interface Deposit {
     email: string;
   };
   amount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: "pending" | "approved" | "rejected" | "refunded";
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -43,7 +40,7 @@ export interface CreateDepositData {
 }
 
 export interface UpdateDepositData {
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: "pending" | "approved" | "rejected" | "refunded";
   notes?: string;
 }
 
@@ -55,9 +52,12 @@ export interface DepositStatusResponse {
 /**
  * Create a new deposit for a car
  */
-export async function createDeposit(data: CreateDepositData, token: string): Promise<{ message: string; deposit: Deposit }> {
+export async function createDeposit(
+  data: CreateDepositData,
+  token: string,
+): Promise<{ message: string; deposit: Deposit }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.post(API_URL, data, {
@@ -71,7 +71,7 @@ export async function createDeposit(data: CreateDepositData, token: string): Pro
  */
 export async function fetchUserDeposits(token: string): Promise<Deposit[]> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.get(API_URL, {
@@ -83,9 +83,12 @@ export async function fetchUserDeposits(token: string): Promise<Deposit[]> {
 /**
  * Check if user has a deposit for a specific car
  */
-export async function checkDepositStatus(listingId: string, token: string): Promise<DepositStatusResponse> {
+export async function checkDepositStatus(
+  listingId: string,
+  token: string,
+): Promise<DepositStatusResponse> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   try {
@@ -104,13 +107,17 @@ export async function checkDepositStatus(listingId: string, token: string): Prom
 /**
  * Update deposit status (admin only)
  */
-export async function updateDepositStatus(listingId: string, data: UpdateDepositData, token: string): Promise<{ message: string; deposit: Deposit }> {
+export async function updateDepositStatus(
+  listingId: string,
+  data: UpdateDepositData,
+  token: string,
+): Promise<{ message: string; deposit: Deposit }> {
   if (!token) {
-    throw new Error('Не сте влезли в профила си.');
+    throw new Error("Не сте влезли в профила си.");
   }
 
   const response = await api.put(`${API_URL}/${listingId}`, data, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
-} 
+}

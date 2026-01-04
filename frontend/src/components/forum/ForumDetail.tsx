@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import authService from '../../services/authService';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import authService from "../../services/authService";
 
 interface Forum {
   _id: string;
@@ -23,11 +23,11 @@ const ForumDetail: React.FC = () => {
   const navigate = useNavigate();
   const [forum, setForum] = useState<Forum | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [newComment, setNewComment] = useState('');
+  const [error, setError] = useState("");
+  const [newComment, setNewComment] = useState("");
   const [submittingComment, setSubmittingComment] = useState(false);
-  const [actionError, setActionError] = useState('');
-  const [actionSuccess, setActionSuccess] = useState('');
+  const [actionError, setActionError] = useState("");
+  const [actionSuccess, setActionSuccess] = useState("");
   const currentUser = authService.getCurrentUser();
   const token = authService.getToken();
 
@@ -39,16 +39,16 @@ const ForumDetail: React.FC = () => {
 
   const fetchForum = async () => {
     setLoading(true);
-    setError('');
+    setError("");
     try {
       const res = await fetch(`/api/forums/${id}`);
       if (!res.ok) {
-        throw new Error('Форумът не е намерен');
+        throw new Error("Форумът не е намерен");
       }
       const data = await res.json();
       setForum(data);
     } catch (err) {
-      setError('Грешка при зареждане на форума.');
+      setError("Грешка при зареждане на форума.");
     } finally {
       setLoading(false);
     }
@@ -59,32 +59,36 @@ const ForumDetail: React.FC = () => {
     if (!newComment.trim() || !id) return;
 
     setSubmittingComment(true);
-    setActionError('');
-    setActionSuccess('');
+    setActionError("");
+    setActionSuccess("");
 
     try {
       const res = await fetch(`/api/forums/${id}/comments`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content: newComment }),
       });
 
       if (!res.ok) {
-        throw new Error('Грешка при добавяне на коментар');
+        throw new Error("Грешка при добавяне на коментар");
       }
 
       const comment = await res.json();
-      setForum(prev => prev ? {
-        ...prev,
-        comments: [...prev.comments, comment]
-      } : null);
-      setNewComment('');
-      setActionSuccess('Коментарът е добавен успешно!');
+      setForum((prev) =>
+        prev
+          ? {
+              ...prev,
+              comments: [...prev.comments, comment],
+            }
+          : null,
+      );
+      setNewComment("");
+      setActionSuccess("Коментарът е добавен успешно!");
     } catch (err) {
-      setActionError('Грешка при добавяне на коментара.');
+      setActionError("Грешка при добавяне на коментара.");
     } finally {
       setSubmittingComment(false);
     }
@@ -93,49 +97,60 @@ const ForumDetail: React.FC = () => {
   const handleDeleteComment = async (commentId: string) => {
     if (!id) return;
 
-    setActionError('');
-    setActionSuccess('');
+    setActionError("");
+    setActionSuccess("");
 
     try {
       await fetch(`/api/forums/${id}/comments/${commentId}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setForum(prev => prev ? {
-        ...prev,
-        comments: prev.comments.filter(c => c._id !== commentId)
-      } : null);
-      setActionSuccess('Коментарът е изтрит!');
+      setForum((prev) =>
+        prev
+          ? {
+              ...prev,
+              comments: prev.comments.filter((c) => c._id !== commentId),
+            }
+          : null,
+      );
+      setActionSuccess("Коментарът е изтрит!");
     } catch (err) {
-      setActionError('Грешка при изтриване на коментара.');
+      setActionError("Грешка при изтриване на коментара.");
     }
   };
 
   const handleDeleteForum = async () => {
     if (!id) return;
 
-    if (!window.confirm('Сигурни ли сте, че искате да изтриете този форум?')) {
+    if (!window.confirm("Сигурни ли сте, че искате да изтриете този форум?")) {
       return;
     }
 
     try {
       await fetch(`/api/forums/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate('/forums');
+      navigate("/forums");
     } catch (err) {
-      setActionError('Грешка при изтриване на форума.');
+      setActionError("Грешка при изтриване на форума.");
     }
   };
 
   const canDeleteForum = () => {
-    return currentUser && forum && (currentUser.role === 'admin' || currentUser.id === forum.owner._id);
+    return (
+      currentUser &&
+      forum &&
+      (currentUser.role === "admin" || currentUser.id === forum.owner._id)
+    );
   };
 
   const canDeleteComment = (comment: ForumComment) => {
-    return currentUser && (currentUser.role === 'admin' || currentUser.id === comment.author._id);
+    return (
+      currentUser &&
+      (currentUser.role === "admin" || currentUser.id === comment.author._id)
+    );
   };
 
   if (loading) {
@@ -154,10 +169,12 @@ const ForumDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-primary-100 py-12">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center text-red-600 text-xl">{error || 'Форумът не е намерен'}</div>
+          <div className="text-center text-red-600 text-xl">
+            {error || "Форумът не е намерен"}
+          </div>
           <div className="text-center mt-4">
             <button
-              onClick={() => navigate('/forums')}
+              onClick={() => navigate("/forums")}
               className="bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 rounded-md"
             >
               Назад към форумите
@@ -173,7 +190,7 @@ const ForumDetail: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="mb-6">
           <button
-            onClick={() => navigate('/forums')}
+            onClick={() => navigate("/forums")}
             className="text-primary-600 hover:text-primary-700 font-semibold mb-4 flex items-center"
           >
             ← Назад към форумите
@@ -183,7 +200,9 @@ const ForumDetail: React.FC = () => {
         <div className="bg-white rounded-2xl shadow-md p-6 border border-primary-100 mb-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-primary-800 mb-2">{forum.title}</h1>
+              <h1 className="text-3xl font-bold text-primary-800 mb-2">
+                {forum.title}
+              </h1>
               <p className="text-gray-600">Създаден от {forum.owner.name}</p>
             </div>
             {canDeleteForum() && (
@@ -202,13 +221,18 @@ const ForumDetail: React.FC = () => {
 
         {/* Коментари секция */}
         <div className="bg-white rounded-2xl shadow-md p-6 border border-primary-100">
-          <h2 className="text-2xl font-bold text-primary-800 mb-6">Коментари ({forum.comments.length})</h2>
+          <h2 className="text-2xl font-bold text-primary-800 mb-6">
+            Коментари ({forum.comments.length})
+          </h2>
 
           {/* Форма за нов коментар */}
           {currentUser && (
             <form onSubmit={handleAddComment} className="mb-8">
               <div className="mb-4">
-                <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="comment"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Добави коментар
                 </label>
                 <textarea
@@ -226,7 +250,7 @@ const ForumDetail: React.FC = () => {
                 disabled={submittingComment || !newComment.trim()}
                 className="bg-primary-600 hover:bg-primary-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-200"
               >
-                {submittingComment ? 'Добавяне...' : 'Добави коментар'}
+                {submittingComment ? "Добавяне..." : "Добави коментар"}
               </button>
             </form>
           )}
@@ -238,14 +262,16 @@ const ForumDetail: React.FC = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {forum.comments.map(comment => (
+              {forum.comments.map((comment) => (
                 <div key={comment._id} className="bg-primary-50 rounded-lg p-4">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center mb-2">
-                        <span className="font-semibold text-primary-800">{comment.author.name}</span>
+                        <span className="font-semibold text-primary-800">
+                          {comment.author.name}
+                        </span>
                         <span className="ml-2 text-sm text-gray-500">
-                          {new Date(comment.createdAt).toLocaleString('bg')}
+                          {new Date(comment.createdAt).toLocaleString("bg")}
                         </span>
                       </div>
                       <p className="text-gray-700">{comment.content}</p>
@@ -281,4 +307,4 @@ const ForumDetail: React.FC = () => {
   );
 };
 
-export default ForumDetail; 
+export default ForumDetail;

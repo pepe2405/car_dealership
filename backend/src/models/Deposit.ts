@@ -1,10 +1,10 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface IDeposit extends Document {
   listingId: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
   amount: number;
-  status: 'pending' | 'approved' | 'rejected' | 'refunded';
+  status: "pending" | "approved" | "rejected" | "refunded";
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -14,12 +14,12 @@ const depositSchema = new Schema<IDeposit>(
   {
     listingId: {
       type: Schema.Types.ObjectId,
-      ref: 'Car',
+      ref: "Car",
       required: true,
     },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     amount: {
@@ -29,8 +29,8 @@ const depositSchema = new Schema<IDeposit>(
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'refunded'],
-      default: 'pending',
+      enum: ["pending", "approved", "rejected", "refunded"],
+      default: "pending",
     },
     notes: {
       type: String,
@@ -39,13 +39,12 @@ const depositSchema = new Schema<IDeposit>(
   },
   {
     timestamps: true,
-  }
+  },
 );
-
 
 depositSchema.index({ listingId: 1 });
 depositSchema.index({ userId: 1 });
 depositSchema.index({ status: 1 });
 depositSchema.index({ listingId: 1, userId: 1 }, { unique: true });
 
-export const Deposit = mongoose.model<IDeposit>('Deposit', depositSchema); 
+export const Deposit = mongoose.model<IDeposit>("Deposit", depositSchema);

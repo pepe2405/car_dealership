@@ -33,11 +33,11 @@
  *           format: date-time
  */
 
-import express, { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
-import { auth } from '../middleware/auth';
-import { Deposit } from '../models/Deposit';
-import { Car } from '../models/Car';
+import express, { Request, Response } from "express";
+import { body, validationResult } from "express-validator";
+import { auth } from "../middleware/auth";
+import { Deposit } from "../models/Deposit";
+import { Car } from "../models/Car";
 
 const router = express.Router();
 
@@ -79,12 +79,14 @@ const router = express.Router();
  *         description: Deposit already exists for this user and listing
  */
 router.post(
-  '/',
+  "/",
   auth,
   [
-    body('listingId').isMongoId().withMessage('Valid listing ID is required'),
-    body('amount').isFloat({ min: 0 }).withMessage('Amount must be a positive number'),
-    body('notes').optional().isString().withMessage('Notes must be a string'),
+    body("listingId").isMongoId().withMessage("Valid listing ID is required"),
+    body("amount")
+      .isFloat({ min: 0 })
+      .withMessage("Amount must be a positive number"),
+    body("notes").optional().isString().withMessage("Notes must be a string"),
   ],
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -96,27 +98,25 @@ router.post(
       const { listingId, amount, notes } = req.body;
       const userId = (req as any).user._id;
 
-     
       const car = await Car.findById(listingId);
       if (!car) {
-        return res.status(404).json({ message: 'Car not found' });
+        return res.status(404).json({ message: "Car not found" });
       }
 
-     
-      if (car.status !== 'available') {
-        return res.status(400).json({ message: 'Car is not available for deposit' });
+      if (car.status !== "available") {
+        return res
+          .status(400)
+          .json({ message: "Car is not available for deposit" });
       }
 
-     
       const existingDeposit = await Deposit.findOne({ listingId, userId });
       if (existingDeposit) {
-        return res.status(409).json({ 
-          message: 'You already have a deposit for this car',
-          deposit: existingDeposit 
+        return res.status(409).json({
+          message: "You already have a deposit for this car",
+          deposit: existingDeposit,
         });
       }
 
-     
       const deposit = new Deposit({
         listingId,
         userId,
@@ -126,19 +126,18 @@ router.post(
 
       await deposit.save();
 
-     
-      await deposit.populate('listingId', 'brand carModel year price');
-      await deposit.populate('userId', 'name email');
+      await deposit.populate("listingId", "brand carModel year price");
+      await deposit.populate("userId", "name email");
 
       res.status(201).json({
-        message: 'Deposit created successfully',
+        message: "Deposit created successfully",
         deposit,
       });
     } catch (error) {
-      console.error('Error creating deposit:', error);
-      res.status(500).json({ message: 'Failed to create deposit', error });
+      console.error("Error creating deposit:", error);
+      res.status(500).json({ message: "Failed to create deposit", error });
     }
-  }
+  },
 );
 
 /**
@@ -153,18 +152,18 @@ router.post(
  *       200:
  *         description: List of user's deposits
  */
-router.get('/', auth, async (req: Request, res: Response) => {
+router.get("/", auth, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id;
     const deposits = await Deposit.find({ userId })
-      .populate('listingId', 'brand carModel year price images')
-      .populate('userId', 'name email')
+      .populate("listingId", "brand carModel year price images")
+      .populate("userId", "name email")
       .sort({ createdAt: -1 });
 
     res.json(deposits);
   } catch (error) {
-    console.error('Error fetching deposits:', error);
-    res.status(500).json({ message: 'Failed to fetch deposits', error });
+    console.error("Error fetching deposits:", error);
+    res.status(500).json({ message: "Failed to fetch deposits", error });
   }
 });
 
@@ -189,19 +188,19 @@ router.get('/', auth, async (req: Request, res: Response) => {
  *       404:
  *         description: Deposit not found
  */
-router.get('/:listingId', auth, async (req: Request, res: Response) => {
+router.get("/:listingId", auth, async (req: Request, res: Response) => {
   try {
     const { listingId } = req.params;
     const userId = (req as any).user._id;
 
     const deposit = await Deposit.findOne({ listingId, userId })
-      .populate('listingId', 'brand carModel year price images')
-      .populate('userId', 'name email');
+      .populate("listingId", "brand carModel year price images")
+      .populate("userId", "name email");
 
     if (!deposit) {
-      return res.status(404).json({ 
-        message: 'No deposit found for this car',
-        hasDeposit: false 
+      return res.status(404).json({
+        message: "No deposit found for this car",
+        hasDeposit: false,
       });
     }
 
@@ -210,8 +209,8 @@ router.get('/:listingId', auth, async (req: Request, res: Response) => {
       deposit,
     });
   } catch (error) {
-    console.error('Error fetching deposit status:', error);
-    res.status(500).json({ message: 'Failed to fetch deposit status', error });
+    console.error("Error fetching deposit status:", error);
+    res.status(500).json({ message: "Failed to fetch deposit status", error });
   }
 });
 
@@ -229,23 +228,22 @@ router.get('/:listingId', auth, async (req: Request, res: Response) => {
  *       403:
  *         description: Access denied
  */
-router.get('/admin/all', auth, async (req: Request, res: Response) => {
+router.get("/admin/all", auth, async (req: Request, res: Response) => {
   try {
-   
     const user = (req as any).user;
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied' });
+    if (user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     const deposits = await Deposit.find()
-      .populate('listingId', 'brand carModel year price images')
-      .populate('userId', 'name email')
+      .populate("listingId", "brand carModel year price images")
+      .populate("userId", "name email")
       .sort({ createdAt: -1 });
 
     res.json(deposits);
   } catch (error) {
-    console.error('Error fetching all deposits:', error);
-    res.status(500).json({ message: 'Failed to fetch deposits', error });
+    console.error("Error fetching all deposits:", error);
+    res.status(500).json({ message: "Failed to fetch deposits", error });
   }
 });
 
@@ -261,28 +259,26 @@ router.get('/admin/all', auth, async (req: Request, res: Response) => {
  *       200:
  *         description: List of deposits for user's cars
  */
-router.get('/owner/cars', auth, async (req: Request, res: Response) => {
+router.get("/owner/cars", auth, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id;
 
-   
-    const userCars = await Car.find({ seller: userId }).select('_id');
-    const carIds = userCars.map(car => car._id);
+    const userCars = await Car.find({ seller: userId }).select("_id");
+    const carIds = userCars.map((car) => car._id);
 
     if (carIds.length === 0) {
       return res.json([]);
     }
 
-   
     const deposits = await Deposit.find({ listingId: { $in: carIds } })
-      .populate('listingId', 'brand carModel year price images')
-      .populate('userId', 'name email')
+      .populate("listingId", "brand carModel year price images")
+      .populate("userId", "name email")
       .sort({ createdAt: -1 });
 
     res.json(deposits);
   } catch (error) {
-    console.error('Error fetching owner deposits:', error);
-    res.status(500).json({ message: 'Failed to fetch deposits', error });
+    console.error("Error fetching owner deposits:", error);
+    res.status(500).json({ message: "Failed to fetch deposits", error });
   }
 });
 
@@ -318,49 +314,49 @@ router.get('/owner/cars', auth, async (req: Request, res: Response) => {
  *       404:
  *         description: Deposit not found
  */
-router.put('/:depositId/approve', auth, async (req: Request, res: Response) => {
+router.put("/:depositId/approve", auth, async (req: Request, res: Response) => {
   try {
     const { depositId } = req.params;
     const { notes } = req.body;
     const userId = (req as any).user._id;
 
     const deposit = await Deposit.findById(depositId)
-      .populate('listingId', 'seller brand carModel year price')
-      .populate('userId', 'name email');
+      .populate("listingId", "seller brand carModel year price")
+      .populate("userId", "name email");
 
     if (!deposit) {
-      return res.status(404).json({ message: 'Deposit not found' });
+      return res.status(404).json({ message: "Deposit not found" });
     }
 
-   
     const listingId = deposit.listingId as any;
     if (listingId.seller.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'Access denied - you are not the owner of this car' });
+      return res
+        .status(403)
+        .json({ message: "Access denied - you are not the owner of this car" });
     }
 
-   
-    if (deposit.status !== 'pending') {
-      return res.status(400).json({ message: 'Deposit is not pending for approval' });
+    if (deposit.status !== "pending") {
+      return res
+        .status(400)
+        .json({ message: "Deposit is not pending for approval" });
     }
 
-   
-    deposit.status = 'approved';
+    deposit.status = "approved";
     if (notes) {
       deposit.notes = notes;
     }
 
     await deposit.save();
 
-   
-    await Car.findByIdAndUpdate(listingId._id, { status: 'reserved' });
+    await Car.findByIdAndUpdate(listingId._id, { status: "reserved" });
 
     res.json({
-      message: 'Deposit approved successfully',
+      message: "Deposit approved successfully",
       deposit,
     });
   } catch (error) {
-    console.error('Error approving deposit:', error);
-    res.status(500).json({ message: 'Failed to approve deposit', error });
+    console.error("Error approving deposit:", error);
+    res.status(500).json({ message: "Failed to approve deposit", error });
   }
 });
 
@@ -396,33 +392,34 @@ router.put('/:depositId/approve', auth, async (req: Request, res: Response) => {
  *       404:
  *         description: Deposit not found
  */
-router.put('/:depositId/reject', auth, async (req: Request, res: Response) => {
+router.put("/:depositId/reject", auth, async (req: Request, res: Response) => {
   try {
     const { depositId } = req.params;
     const { notes } = req.body;
     const userId = (req as any).user._id;
 
     const deposit = await Deposit.findById(depositId)
-      .populate('listingId', 'seller brand carModel year price')
-      .populate('userId', 'name email');
+      .populate("listingId", "seller brand carModel year price")
+      .populate("userId", "name email");
 
     if (!deposit) {
-      return res.status(404).json({ message: 'Deposit not found' });
+      return res.status(404).json({ message: "Deposit not found" });
     }
 
-   
     const listingId = deposit.listingId as any;
     if (listingId.seller.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'Access denied - you are not the owner of this car' });
+      return res
+        .status(403)
+        .json({ message: "Access denied - you are not the owner of this car" });
     }
 
-   
-    if (deposit.status !== 'pending') {
-      return res.status(400).json({ message: 'Deposit is not pending for approval' });
+    if (deposit.status !== "pending") {
+      return res
+        .status(400)
+        .json({ message: "Deposit is not pending for approval" });
     }
 
-   
-    deposit.status = 'rejected';
+    deposit.status = "rejected";
     if (notes) {
       deposit.notes = notes;
     }
@@ -430,12 +427,12 @@ router.put('/:depositId/reject', auth, async (req: Request, res: Response) => {
     await deposit.save();
 
     res.json({
-      message: 'Deposit rejected successfully',
+      message: "Deposit rejected successfully",
       deposit,
     });
   } catch (error) {
-    console.error('Error rejecting deposit:', error);
-    res.status(500).json({ message: 'Failed to reject deposit', error });
+    console.error("Error rejecting deposit:", error);
+    res.status(500).json({ message: "Failed to reject deposit", error });
   }
 });
 
@@ -474,20 +471,19 @@ router.put('/:depositId/reject', auth, async (req: Request, res: Response) => {
  *       404:
  *         description: Deposit not found
  */
-router.put('/:depositId', auth, async (req: Request, res: Response) => {
+router.put("/:depositId", auth, async (req: Request, res: Response) => {
   try {
     const { depositId } = req.params;
     const { status, notes } = req.body;
 
-   
     const user = (req as any).user;
-    if (user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied' });
+    if (user.role !== "admin") {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     const deposit = await Deposit.findById(depositId);
     if (!deposit) {
-      return res.status(404).json({ message: 'Deposit not found' });
+      return res.status(404).json({ message: "Deposit not found" });
     }
 
     deposit.status = status;
@@ -497,18 +493,17 @@ router.put('/:depositId', auth, async (req: Request, res: Response) => {
 
     await deposit.save();
 
-   
-    await deposit.populate('listingId', 'brand carModel year price');
-    await deposit.populate('userId', 'name email');
+    await deposit.populate("listingId", "brand carModel year price");
+    await deposit.populate("userId", "name email");
 
     res.json({
-      message: 'Deposit updated successfully',
+      message: "Deposit updated successfully",
       deposit,
     });
   } catch (error) {
-    console.error('Error updating deposit:', error);
-    res.status(500).json({ message: 'Failed to update deposit', error });
+    console.error("Error updating deposit:", error);
+    res.status(500).json({ message: "Failed to update deposit", error });
   }
 });
 
-export default router; 
+export default router;

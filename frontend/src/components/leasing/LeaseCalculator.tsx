@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react';
-import { getLeaseOptions, LeaseOption, calculateLease } from '../../services/leaseService';
+import { useState, useEffect } from "react";
+import {
+  getLeaseOptions,
+  LeaseOption,
+  calculateLease,
+} from "../../services/leaseService";
 
 const LeaseCalculator: React.FC = () => {
   const [leaseOptions, setLeaseOptions] = useState<LeaseOption[]>([]);
-  const [selectedOption, setSelectedOption] = useState<LeaseOption | null>(null);
+  const [selectedOption, setSelectedOption] = useState<LeaseOption | null>(
+    null,
+  );
   const [carPrice, setCarPrice] = useState<number>(0);
   const [calculation, setCalculation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -30,7 +36,7 @@ const LeaseCalculator: React.FC = () => {
         setSelectedOption(options[0]);
       }
     } catch (err) {
-      console.error('Error fetching lease options:', err);
+      console.error("Error fetching lease options:", err);
     } finally {
       setLoading(false);
     }
@@ -42,7 +48,7 @@ const LeaseCalculator: React.FC = () => {
   };
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const option = leaseOptions.find(opt => opt._id === e.target.value);
+    const option = leaseOptions.find((opt) => opt._id === e.target.value);
     setSelectedOption(option || null);
   };
 
@@ -56,19 +62,24 @@ const LeaseCalculator: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-primary-800 mb-6">Калкулатор за лизинг</h2>
+      <h2 className="text-2xl font-bold text-primary-800 mb-6">
+        Калкулатор за лизинг
+      </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Input секция */}
         <div className="space-y-4">
           <div>
-            <label htmlFor="carPrice" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="carPrice"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Цена на автомобила (лв.)
             </label>
             <input
               type="number"
               id="carPrice"
-              value={carPrice || ''}
+              value={carPrice || ""}
               onChange={handleCarPriceChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               placeholder="Въведете цена на автомобила"
@@ -77,12 +88,15 @@ const LeaseCalculator: React.FC = () => {
           </div>
 
           <div>
-            <label htmlFor="leaseOption" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="leaseOption"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Опция за лизинг
             </label>
             <select
               id="leaseOption"
-              value={selectedOption?._id || ''}
+              value={selectedOption?._id || ""}
               onChange={handleOptionChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             >
@@ -96,7 +110,9 @@ const LeaseCalculator: React.FC = () => {
 
           {selectedOption && (
             <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-semibold text-gray-800 mb-2">Избрана опция:</h3>
+              <h3 className="font-semibold text-gray-800 mb-2">
+                Избрана опция:
+              </h3>
               <div className="text-sm text-gray-600 space-y-1">
                 <div>Първоначална вноска: {selectedOption.downPayment}%</div>
                 <div>Лихвен процент: {selectedOption.interestRate}%</div>
@@ -108,53 +124,62 @@ const LeaseCalculator: React.FC = () => {
 
         {/* Резултати секция */}
         <div className="bg-primary-50 rounded-lg p-6">
-          <h3 className="text-xl font-bold text-primary-800 mb-4">Резултат от изчислението</h3>
+          <h3 className="text-xl font-bold text-primary-800 mb-4">
+            Резултат от изчислението
+          </h3>
 
           {calculation ? (
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Цена на автомобила:</span>
-                <span className="font-semibold">{calculation.carPrice.toLocaleString('bg')} лв.</span>
+                <span className="font-semibold">
+                  {calculation.carPrice.toLocaleString("bg")} лв.
+                </span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Първоначална вноска:</span>
                 <span className="font-semibold text-primary-600">
-                  {calculation.downPaymentAmount.toLocaleString('bg')} лв.
+                  {calculation.downPaymentAmount.toLocaleString("bg")} лв.
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Финансирана сума:</span>
                 <span className="font-semibold">
-                  {calculation.financedAmount.toLocaleString('bg')} лв.
+                  {calculation.financedAmount.toLocaleString("bg")} лв.
                 </span>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="text-gray-600">Общо лихви:</span>
                 <span className="font-semibold text-red-600">
-                  {calculation.totalInterest.toLocaleString('bg')} лв.
+                  {calculation.totalInterest.toLocaleString("bg")} лв.
                 </span>
               </div>
 
               <div className="border-t border-gray-300 pt-4">
                 <div className="flex justify-between items-center text-lg font-bold text-primary-800">
                   <span>Месечна вноска:</span>
-                  <span>{calculation.monthlyPayment.toLocaleString('bg')} лв.</span>
+                  <span>
+                    {calculation.monthlyPayment.toLocaleString("bg")} лв.
+                  </span>
                 </div>
               </div>
 
               <div className="border-t border-gray-300 pt-4">
                 <div className="flex justify-between items-center text-lg font-bold">
                   <span>Общо плащания:</span>
-                  <span>{calculation.totalPayments.toLocaleString('bg')} лв.</span>
+                  <span>
+                    {calculation.totalPayments.toLocaleString("bg")} лв.
+                  </span>
                 </div>
               </div>
 
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-4">
                 <div className="text-sm text-yellow-800">
-                  <strong>Важно:</strong> Това са приблизителни изчисления. За точни условия се свържете с нас.
+                  <strong>Важно:</strong> Това са приблизителни изчисления. За
+                  точни условия се свържете с нас.
                 </div>
               </div>
             </div>
@@ -169,4 +194,4 @@ const LeaseCalculator: React.FC = () => {
   );
 };
 
-export default LeaseCalculator; 
+export default LeaseCalculator;

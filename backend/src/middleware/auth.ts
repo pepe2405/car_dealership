@@ -1,20 +1,27 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { User } from '../models/User';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { User } from "../models/User";
 
 interface AuthRequest extends Request {
   user?: any;
 }
 
-export const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const auth = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) {
       throw new Error();
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_key_here');
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "your_jwt_secret_key_here",
+    );
     const user = await User.findOne({ _id: (decoded as any)._id });
 
     if (!user) {
@@ -24,20 +31,20 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Please authenticate.' });
+    res.status(401).json({ message: "Please authenticate." });
   }
 };
 
 export const checkRole = (roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ message: 'Please authenticate.' });
+      return res.status(401).json({ message: "Please authenticate." });
     }
 
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Access denied.' });
+      return res.status(403).json({ message: "Access denied." });
     }
 
     next();
   };
-}; 
+};

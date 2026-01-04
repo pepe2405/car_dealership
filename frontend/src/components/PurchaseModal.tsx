@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { FaCar, FaCreditCard, FaFileInvoice, FaUser } from 'react-icons/fa';
-import { createSale, CreateSaleData } from '../services/salesService';
-import authService from '../services/authService';
+import React, { useState } from "react";
+import { FaCar, FaCreditCard, FaFileInvoice, FaUser } from "react-icons/fa";
+import { createSale, CreateSaleData } from "../services/salesService";
+import authService from "../services/authService";
 
 interface PurchaseModalProps {
   isOpen: boolean;
@@ -24,44 +24,47 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   carYear,
   onPurchaseCreated,
 }) => {
-  const [purchaseType, setPurchaseType] = useState<'full' | 'leasing'>('full');
+  const [purchaseType, setPurchaseType] = useState<"full" | "leasing">("full");
   const [purchaseDetails, setPurchaseDetails] = useState({
     totalAmount: carPrice,
     downPayment: 0,
     monthlyPayment: 0,
     leaseTerm: 60,
     interestRate: 5.5,
-    notes: '',
+    notes: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const currentUser = authService.getCurrentUser();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setPurchaseDetails(prev => ({ ...prev, [name]: value }));
+    setPurchaseDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handlePurchaseTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const type = e.target.value as 'full' | 'leasing';
+  const handlePurchaseTypeChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const type = e.target.value as "full" | "leasing";
     setPurchaseType(type);
-    
-    if (type === 'full') {
-      setPurchaseDetails(prev => ({
+
+    if (type === "full") {
+      setPurchaseDetails((prev) => ({
         ...prev,
         totalAmount: carPrice,
         downPayment: 0,
         monthlyPayment: 0,
       }));
     } else {
-     
       const downPayment = carPrice * 0.2;
       const remainingAmount = carPrice - downPayment;
       const monthlyPayment = (remainingAmount * (1 + 0.055 * 5)) / 60;
-      
-      setPurchaseDetails(prev => ({
+
+      setPurchaseDetails((prev) => ({
         ...prev,
         totalAmount: carPrice,
         downPayment,
@@ -73,24 +76,28 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
       const token = authService.getToken();
       if (!token) {
-        throw new Error('Не сте влезли в профила си.');
+        throw new Error("Не сте влезли в профила си.");
       }
 
       if (!currentUser) {
-        throw new Error('Не сте влезли в профила си.');
+        throw new Error("Не сте влезли в профила си.");
       }
 
-      if (purchaseType === 'leasing' && (!purchaseDetails.downPayment || !purchaseDetails.monthlyPayment)) {
-        throw new Error('За лизинг са необходими първоначална вноска и месечна вноска.');
+      if (
+        purchaseType === "leasing" &&
+        (!purchaseDetails.downPayment || !purchaseDetails.monthlyPayment)
+      ) {
+        throw new Error(
+          "За лизинг са необходими първоначална вноска и месечна вноска.",
+        );
       }
 
-     
       const purchaseData: CreateSaleData = {
         carId,
         buyerId: currentUser.id,
@@ -99,8 +106,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         notes: purchaseDetails.notes,
       };
 
-     
-      if (purchaseType === 'leasing') {
+      if (purchaseType === "leasing") {
         purchaseData.downPayment = purchaseDetails.downPayment;
         purchaseData.monthlyPayment = purchaseDetails.monthlyPayment;
         purchaseData.leaseTerm = purchaseDetails.leaseTerm;
@@ -108,17 +114,15 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       }
 
       const result = await createSale(purchaseData, token);
-      
-      setSuccess('Покупката е създадена успешно!');
-      
-     
+
+      setSuccess("Покупката е създадена успешно!");
+
       setTimeout(() => {
         onPurchaseCreated();
         onClose();
       }, 2000);
-
     } catch (err: any) {
-      setError(err.message || 'Грешка при създаване на покупката.');
+      setError(err.message || "Грешка при създаване на покупката.");
     } finally {
       setLoading(false);
     }
@@ -153,7 +157,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               {error}
             </div>
           )}
-          
+
           {success && (
             <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
               {success}
@@ -188,7 +192,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 </label>
                 <input
                   type="text"
-                  value={currentUser?.name || ''}
+                  value={currentUser?.name || ""}
                   readOnly
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
                 />
@@ -199,7 +203,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 </label>
                 <input
                   type="email"
-                  value={currentUser?.email || ''}
+                  value={currentUser?.email || ""}
                   readOnly
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
                 />
@@ -213,7 +217,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
               <FaCreditCard className="text-primary-500" />
               Детайли на покупката
             </h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -229,7 +233,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 />
               </div>
 
-              {purchaseType === 'leasing' && (
+              {purchaseType === "leasing" && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -314,27 +318,35 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Автомобил:</span>
-                <span className="font-medium">{carBrand} {carModel} ({carYear})</span>
+                <span className="font-medium">
+                  {carBrand} {carModel} ({carYear})
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Тип покупка:</span>
                 <span className="font-medium">
-                  {purchaseType === 'full' ? 'Пълна покупка' : 'Лизинг'}
+                  {purchaseType === "full" ? "Пълна покупка" : "Лизинг"}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Обща сума:</span>
-                <span className="font-medium">${purchaseDetails.totalAmount.toLocaleString()}</span>
+                <span className="font-medium">
+                  ${purchaseDetails.totalAmount.toLocaleString()}
+                </span>
               </div>
-              {purchaseType === 'leasing' && (
+              {purchaseType === "leasing" && (
                 <>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Първоначална вноска:</span>
-                    <span className="font-medium">${purchaseDetails.downPayment.toLocaleString()}</span>
+                    <span className="font-medium">
+                      ${purchaseDetails.downPayment.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Месечна вноска:</span>
-                    <span className="font-medium">${purchaseDetails.monthlyPayment.toLocaleString()}</span>
+                    <span className="font-medium">
+                      ${purchaseDetails.monthlyPayment.toLocaleString()}
+                    </span>
                   </div>
                 </>
               )}
@@ -374,4 +386,4 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
   );
 };
 
-export default PurchaseModal; 
+export default PurchaseModal;
