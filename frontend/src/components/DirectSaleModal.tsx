@@ -67,10 +67,10 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
         monthlyPayment: 0,
       }));
     } else {
-      // Calculate leasing payments
-      const downPayment = carPrice * 0.2; // 20% down payment
+     
+      const downPayment = carPrice * 0.2;
       const remainingAmount = carPrice - downPayment;
-      const monthlyPayment = (remainingAmount * (1 + 0.055 * 5)) / 60; // 5 years, 5.5% interest
+      const monthlyPayment = (remainingAmount * (1 + 0.055 * 5)) / 60;
       
       setSaleDetails(prev => ({
         ...prev,
@@ -93,7 +93,7 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
         throw new Error('Не сте влезли в профила си.');
       }
 
-      // Validate required fields
+     
       if (!buyerInfo.name || !buyerInfo.email) {
         throw new Error('Името и имейлът на купувача са задължителни.');
       }
@@ -102,16 +102,16 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
         throw new Error('За лизинг са необходими първоначална вноска и месечна вноска.');
       }
 
-      // Create sale data
+     
       const saleData: CreateSaleData = {
         carId,
-        buyerId: currentUser?.id || '', // This should be the actual buyer ID
+        buyerId: currentUser?.id || '',
         saleType,
         totalAmount: saleDetails.totalAmount,
         notes: saleDetails.notes,
       };
 
-      // Add leasing details if applicable
+     
       if (saleType === 'leasing') {
         saleData.downPayment = saleDetails.downPayment;
         saleData.monthlyPayment = saleDetails.monthlyPayment;
@@ -123,7 +123,7 @@ const DirectSaleModal: React.FC<DirectSaleModalProps> = ({
       
       setSuccess('Продажбата е създадена успешно!');
       
-      // Close modal after a short delay
+     
       setTimeout(() => {
         onSaleCreated();
         onClose();

@@ -20,7 +20,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    if (error) setError(''); // Reset error on input change
+    if (error) setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

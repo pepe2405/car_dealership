@@ -6,7 +6,7 @@ import { getAllUsersForChat } from '../services/adminService';
 import { UserProfile } from '../services/userService';
 
 const API_URL = '/api';
-const SOCKET_URL = 'http://localhost:5000'; // смени при нужда
+const SOCKET_URL = 'http://localhost:5000';
 
 interface Message {
   _id: string;
@@ -39,7 +39,7 @@ const Messages: React.FC = () => {
       navigate('/login');
       return;
     }
-    // Инициализация на socket
+   
     socketRef.current = io(SOCKET_URL, {
       transports: ['websocket'],
     });
@@ -52,18 +52,18 @@ const Messages: React.FC = () => {
       ) {
         setMessages((prev) => [...prev, msg]);
       }
-      // Обнови списъка с чатове
+     
       fetchChats();
     });
     return () => {
       socketRef.current?.disconnect();
     };
-    // eslint-disable-next-line
+   
   }, [activeChat]);
 
   useEffect(() => {
     fetchChats();
-    // eslint-disable-next-line
+   
   }, []);
 
   useEffect(() => {

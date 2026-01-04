@@ -2,9 +2,9 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ILeaseOption extends Document {
   name: string;
-  duration: number; // в месеци
-  downPayment: number; // първоначална вноска (%)
-  interestRate: number; // лихвен процент
+  duration: number;
+  downPayment: number;
+  interestRate: number;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;

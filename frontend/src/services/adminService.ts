@@ -34,7 +34,7 @@ export const deleteUser = async (token: string, userId: string): Promise<void> =
   });
 };
 
-// Car management functions
+
 export const getAllCars = async (token: string): Promise<Car[]> => {
   const response = await axios.get(`${API_URL}/admin/cars`, {
     headers: {

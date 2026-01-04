@@ -11,7 +11,7 @@ const Home = () => {
   const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
   const isBuyer = currentUser?.role === 'buyer';
   
-  // State for cars with deposits
+ 
   const [carsWithDeposits, setCarsWithDeposits] = useState<Car[]>([]);
   const [depositStatuses, setDepositStatuses] = useState<{[carId: string]: DepositStatusResponse}>({});
   const [loading, setLoading] = useState(false);
@@ -19,12 +19,12 @@ const Home = () => {
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const isFetchingDeposits = useRef(false);
 
-  // Fetch cars with deposits for buyers
+ 
   useEffect(() => {
     const fetchCarsWithDeposits = async () => {
       if (!isBuyer || !currentUser) return;
       
-      // Don't fetch if we're already fetching
+     
       if (isFetchingDeposits.current) return;
       
       try {
@@ -33,10 +33,10 @@ const Home = () => {
         const token = authService.getToken();
         if (!token) return;
 
-        // Get all cars using the unauthenticated endpoint to see all cars
+       
         const allCars = await fetchCarsUnauthenticated();
         
-        // Check which cars have deposits
+       
         const carsWithDepositsData: Car[] = [];
         const depositStatusesData: {[carId: string]: DepositStatusResponse} = {};
         
@@ -48,7 +48,7 @@ const Home = () => {
               depositStatusesData[car._id] = status;
             }
           } catch (err) {
-            // Skip cars without deposits
+           
           }
         }
         
@@ -63,7 +63,7 @@ const Home = () => {
     };
 
     fetchCarsWithDeposits();
-  }, [isBuyer, currentUser?.id]); // Use specific ID instead of object
+  }, [isBuyer, currentUser?.id]);
 
   const handleNewDeposit = (car: Car) => {
     setSelectedCar(car);
@@ -71,19 +71,19 @@ const Home = () => {
   };
 
   const handleDepositCreated = () => {
-    // Refresh the data after creating a new deposit
+   
     if (selectedCar && currentUser) {
       const token = authService.getToken();
       if (token) {
-        // Check if the car already exists in the list
+       
         const existingCarIndex = carsWithDeposits.findIndex(car => car._id === selectedCar._id);
         
         if (existingCarIndex === -1) {
-          // Add the car to the list if it's not already there
+         
           setCarsWithDeposits(prev => [...prev, selectedCar]);
         }
         
-        // Refresh deposit status for this car
+       
         checkDepositStatus(selectedCar._id, token)
           .then(status => {
             if (status.hasDeposit) {
@@ -99,7 +99,7 @@ const Home = () => {
       }
     }
     
-    // Close the modal
+   
     setShowDepositModal(false);
     setSelectedCar(null);
   };

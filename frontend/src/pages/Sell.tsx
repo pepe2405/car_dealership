@@ -53,7 +53,7 @@ const Sell = () => {
     setLoading(true);
     setError('');
     setSuccess('');
-    // Trim all relevant fields before validation
+   
     const trimmedForm = {
       ...form,
       brand: form.brand.trim(),
@@ -69,7 +69,7 @@ const Sell = () => {
         country: form.location.country.trim(),
       },
     };
-    // Validate required fields
+   
     if (!trimmedForm.brand) {
       setError('Brand is required');
       setLoading(false);
@@ -265,11 +265,11 @@ const Sell = () => {
   );
 };
 
-// Tailwind custom animation classes
-// Add these to your global CSS if not present:
-// .animate-fade-in { animation: fadeIn 0.7s ease; }
-// .animate-fade-in-down { animation: fadeInDown 0.7s ease; }
-// @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-// @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+
+
+
+
+
 
 export default Sell; 

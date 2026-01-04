@@ -30,7 +30,7 @@ const AdminDeposits = () => {
     try {
       setUpdatingDeposit(depositId);
       await updateDepositStatus(depositId, data, token!);
-      await loadDeposits(); // Reload to get updated data
+      await loadDeposits();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Грешка при обновяване на статуса');
     } finally {

@@ -6,7 +6,7 @@ import { auth, checkRole } from '../middleware/auth';
 
 const router = express.Router();
 
-// Get all users (admin only)
+
 router.get('/users', auth, checkRole(['admin']), async (req: Request, res: Response) => {
   try {
     const users = await User.find().select('-password');
@@ -17,7 +17,7 @@ router.get('/users', auth, checkRole(['admin']), async (req: Request, res: Respo
   }
 });
 
-// Get all cars (admin only)
+
 router.get('/cars', auth, checkRole(['admin']), async (req: Request, res: Response) => {
   try {
     const cars = await Car.find()
@@ -30,7 +30,7 @@ router.get('/cars', auth, checkRole(['admin']), async (req: Request, res: Respon
   }
 });
 
-// Update car (admin only)
+
 router.put(
   '/cars/:carId',
   auth,
@@ -57,7 +57,7 @@ router.put(
         return res.status(404).json({ message: 'Car not found' });
       }
 
-      // Update only the fields that are provided
+     
       const updateFields = [
         'brand', 'carModel', 'year', 'price', 'mileage',
         'fuelType', 'transmission', 'description', 'features',
@@ -81,7 +81,7 @@ router.put(
   }
 );
 
-// Delete car (admin only)
+
 router.delete('/cars/:carId', auth, checkRole(['admin']), async (req: Request, res: Response) => {
   try {
     const car = await Car.findById(req.params.carId);
@@ -97,7 +97,7 @@ router.delete('/cars/:carId', auth, checkRole(['admin']), async (req: Request, r
   }
 });
 
-// Update user (admin only)
+
 router.put(
   '/users/:userId',
   auth,
@@ -122,7 +122,7 @@ router.put(
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Update only the fields that are provided
+     
       if (name !== undefined) user.name = name;
       if (role !== undefined) user.role = role;
       if (phone !== undefined) user.phone = phone;
@@ -130,7 +130,7 @@ router.put(
 
       await user.save();
 
-      // Return updated user without password
+     
       const updatedUser = {
         id: user._id,
         email: user.email,
@@ -148,7 +148,7 @@ router.put(
   }
 );
 
-// Delete user (admin only)
+
 router.delete('/users/:userId', auth, checkRole(['admin']), async (req: Request, res: Response) => {
   try {
     const user = await User.findById(req.params.userId);

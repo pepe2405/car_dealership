@@ -42,10 +42,10 @@ const depositSchema = new Schema<IDeposit>(
   }
 );
 
-// Indexes for better query performance
+
 depositSchema.index({ listingId: 1 });
 depositSchema.index({ userId: 1 });
 depositSchema.index({ status: 1 });
-depositSchema.index({ listingId: 1, userId: 1 }, { unique: true }); // One deposit per user per listing
+depositSchema.index({ listingId: 1, userId: 1 }, { unique: true });
 
 export const Deposit = mongoose.model<IDeposit>('Deposit', depositSchema); 

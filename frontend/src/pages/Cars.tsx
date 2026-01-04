@@ -11,7 +11,7 @@ const Cars = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // Search and filter states
+ 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
@@ -28,7 +28,7 @@ const Cars = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favError, setFavError] = useState('');
 
-  // Get unique brands and models
+ 
   const uniqueBrands = [...new Set(cars.map(car => car.brand))].sort();
   const uniqueModels = [...new Set(cars.map(car => car.carModel))].sort();
   const filteredModels = selectedBrand
@@ -57,7 +57,7 @@ const Cars = () => {
   useEffect(() => {
     let result = [...cars];
 
-    // Apply brand and model filters
+   
     if (selectedBrand) {
       result = result.filter(car => car.brand === selectedBrand);
     }
@@ -65,7 +65,7 @@ const Cars = () => {
       result = result.filter(car => car.carModel === selectedModel);
     }
 
-    // Apply text search
+   
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       result = result.filter(
@@ -75,7 +75,7 @@ const Cars = () => {
       );
     }
 
-    // Apply other filters
+   
     if (filters.minPrice) {
       result = result.filter(car => car.price >= Number(filters.minPrice));
     }
@@ -95,7 +95,7 @@ const Cars = () => {
       result = result.filter(car => car.transmission === filters.transmission);
     }
 
-    // Apply sorting
+   
     switch (filters.sortBy) {
       case 'price-asc':
         result.sort((a, b) => a.price - b.price);

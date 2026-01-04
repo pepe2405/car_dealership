@@ -56,10 +56,10 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         monthlyPayment: 0,
       }));
     } else {
-      // Calculate leasing payments
-      const downPayment = carPrice * 0.2; // 20% down payment
+     
+      const downPayment = carPrice * 0.2;
       const remainingAmount = carPrice - downPayment;
-      const monthlyPayment = (remainingAmount * (1 + 0.055 * 5)) / 60; // 5 years, 5.5% interest
+      const monthlyPayment = (remainingAmount * (1 + 0.055 * 5)) / 60;
       
       setPurchaseDetails(prev => ({
         ...prev,
@@ -90,7 +90,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         throw new Error('За лизинг са необходими първоначална вноска и месечна вноска.');
       }
 
-      // Create purchase data
+     
       const purchaseData: CreateSaleData = {
         carId,
         buyerId: currentUser.id,
@@ -99,7 +99,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
         notes: purchaseDetails.notes,
       };
 
-      // Add leasing details if applicable
+     
       if (purchaseType === 'leasing') {
         purchaseData.downPayment = purchaseDetails.downPayment;
         purchaseData.monthlyPayment = purchaseDetails.monthlyPayment;
@@ -111,7 +111,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
       
       setSuccess('Покупката е създадена успешно!');
       
-      // Close modal after a short delay
+     
       setTimeout(() => {
         onPurchaseCreated();
         onClose();

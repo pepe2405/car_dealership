@@ -59,7 +59,7 @@ export async function deleteLeaseOption(id: string, token: string): Promise<void
   });
 }
 
-// Калкулатор за лизинг - изчислява всички стойности според цената на автомобила
+
 export function calculateLease(carPrice: number, leaseOption: LeaseOption) {
   const downPaymentAmount = (carPrice * leaseOption.downPayment) / 100;
   const financedAmount = carPrice - downPaymentAmount;

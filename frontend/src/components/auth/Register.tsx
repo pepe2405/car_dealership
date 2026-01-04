@@ -23,7 +23,7 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
       ...formData,
       [e.target.name]: e.target.value,
     });
-    if (error) setError(''); // Reset error on input change
+    if (error) setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,12 +32,12 @@ const Register: React.FC<RegisterProps> = ({ onRegister }) => {
     setLoading(true);
 
     try {
-      // Register with default 'buyer' role
+     
       await authService.register(
         formData.email,
         formData.password,
         formData.name,
-        'buyer' // Default role
+        'buyer'
       );
       if (onRegister) onRegister();
       navigate('/');

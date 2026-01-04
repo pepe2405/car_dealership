@@ -30,7 +30,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadCars();
-    // eslint-disable-next-line
+   
   }, []);
 
   const handleDelete = async (id: string) => {
@@ -100,7 +100,7 @@ const Dashboard = () => {
     setError('');
     setSuccess('');
     try {
-      // Use dropped images if any, otherwise use URLs from input
+     
       let imagesArray: string[] = [];
       if (editImages.length > 0) {
         imagesArray = editImagePreviews;
@@ -169,10 +169,9 @@ const Dashboard = () => {
           ))}
         </div>
       )}
-      {/* Edit Modal TODO: FIX SCROLLING*/}
       {editCar && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative animate-fade-in-down">
+          <div className="bg-white rounded-xl shadow-2xl p-8 w-full max-w-lg relative animate-fade-in-down max-h-[90vh] overflow-y-auto">
             <button onClick={closeEdit} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
             <h2 className="text-2xl font-bold mb-4 text-center">Edit Car</h2>
             <form onSubmit={handleEditSubmit} className="space-y-4">

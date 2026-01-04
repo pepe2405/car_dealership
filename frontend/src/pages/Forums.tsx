@@ -30,7 +30,7 @@ const Forums = () => {
 
   useEffect(() => {
     fetchForums();
-    // eslint-disable-next-line
+   
   }, []);
 
   const fetchForums = async () => {

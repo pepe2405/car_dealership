@@ -19,20 +19,20 @@ import leaseOptionsRoutes from './routes/leaseOptions';
 import depositsRoutes from './routes/deposits';
 import salesRoutes from './routes/sales';
 
-// Initialize express app
+
 const app = express();
 
-// Connect to MongoDB
+
 connectDB();
 
-// Middleware
+
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
   exposedHeaders: ['Content-Range', 'X-Content-Range'],
-  maxAge: 86400 // 24 hours
+  maxAge: 86400
 }));
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -42,7 +42,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+
 app.use('/api/test', testRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/cars', carRoutes);
@@ -54,7 +54,7 @@ app.use('/api/lease-options', leaseOptionsRoutes);
 app.use('/api/deposits', depositsRoutes);
 app.use('/api/sales', salesRoutes);
 
-// Swagger setup
+
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
@@ -76,7 +76,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to AutoMarket API' });
 });
 
-// Error handling middleware
+
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(500).json({
@@ -85,7 +85,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Start server with socket.io
+
 const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -95,19 +95,19 @@ const io = new Server(server, {
   },
 });
 
-// Socket.io logic
+
 io.on('connection', (socket) => {
-  // Очаква userId при join
+ 
   socket.on('join', (userId) => {
     socket.join(userId);
   });
 
-  // Изпращане на съобщение
+ 
   socket.on('send_message', async (data) => {
-    // data: { sender, receiver, content }
+   
     const message = await Message.create(data);
     io.to(data.receiver).emit('receive_message', message);
-    io.to(data.sender).emit('receive_message', message); // за да се появи и при изпращача
+    io.to(data.sender).emit('receive_message', message);
   });
 });
 

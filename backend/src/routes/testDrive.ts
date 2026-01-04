@@ -5,7 +5,7 @@ import { Car } from '../models/Car';
 
 const router = express.Router();
 
-// POST /api/test-drives - нова заявка
+
 router.post('/', auth, async (req, res) => {
   try {
     const { car, date, message } = req.body;
@@ -27,7 +27,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
-// GET /api/test-drives - заявки за купувача или продавача
+
 router.get('/', auth, async (req, res) => {
   try {
     const userId = (req as any).user._id;
@@ -35,7 +35,7 @@ router.get('/', auth, async (req, res) => {
     const carId = req.query.car as string | undefined;
     let requests;
     if (carId) {
-      // Връща заявка за тази кола и текущия купувач
+     
       requests = await TestDriveRequest.find({ car: carId, buyer: userId })
         .populate('car')
         .populate('buyer', 'name email')
@@ -59,7 +59,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// GET /api/test-drives/:id - детайли
+
 router.get('/:id', auth, async (req, res) => {
   try {
     const request = await TestDriveRequest.findById(req.params.id)
@@ -73,7 +73,7 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// PUT /api/test-drives/:id - одобряване/отказване
+
 router.put('/:id', auth, async (req, res) => {
   try {
     const userId = (req as any).user._id;
@@ -94,7 +94,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
-// DELETE /api/test-drives/:id - отказ от заявка (само купувачът)
+
 router.delete('/:id', auth, async (req, res) => {
   try {
     const userId = (req as any).user._id;

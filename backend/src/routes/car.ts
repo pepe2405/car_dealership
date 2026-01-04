@@ -82,10 +82,10 @@ const router = express.Router();
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
-    // Get all cars
+   
     const cars = await Car.find().populate('seller', 'name email');
     
-    // For unauthenticated users, show all available cars
+   
     const availableCars = cars.filter(car => car.status === 'available');
     res.json(availableCars);
   } catch (error) {
@@ -109,24 +109,24 @@ router.get('/authenticated', auth, async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     
-    // Get all cars
+   
     const cars = await Car.find().populate('seller', 'name email');
     
-    // If user is admin or seller, show all cars
+   
     if (user.role === 'admin' || user.role === 'seller') {
       return res.json(cars);
     }
     
-    // For buyers, filter out cars they have already made deposits for
+   
     if (user.role === 'buyer') {
-      // Get deposits made by this buyer
+     
       const userDeposits = await Deposit.find({ 
         buyerId: user._id, 
         status: { $in: ['pending', 'approved'] } 
       });
       const carsWithUserDeposits = new Set(userDeposits.map(deposit => deposit.listingId.toString()));
       
-      // Filter out cars that this buyer has already made deposits for or are not available
+     
       const availableCars = cars.filter(car => 
         car.status === 'available' && !carsWithUserDeposits.has((car as any)._id.toString())
       );
@@ -134,7 +134,7 @@ router.get('/authenticated', auth, async (req: Request, res: Response) => {
       return res.json(availableCars);
     }
     
-    // For other authenticated users, show all available cars
+   
     const availableCars = cars.filter(car => car.status === 'available');
     res.json(availableCars);
   } catch (error) {
@@ -158,7 +158,7 @@ router.get('/authenticated', auth, async (req: Request, res: Response) => {
  */
 router.get('/all', auth, async (req: Request, res: Response) => {
   try {
-    // Check if user is admin or seller
+   
     const user = (req as any).user;
     if (user.role !== 'admin' && user.role !== 'seller') {
       return res.status(403).json({ message: 'Access denied' });

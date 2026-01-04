@@ -96,18 +96,18 @@ router.post(
       const { listingId, amount, notes } = req.body;
       const userId = (req as any).user._id;
 
-      // Check if car exists
+     
       const car = await Car.findById(listingId);
       if (!car) {
         return res.status(404).json({ message: 'Car not found' });
       }
 
-      // Check if car is available
+     
       if (car.status !== 'available') {
         return res.status(400).json({ message: 'Car is not available for deposit' });
       }
 
-      // Check if user already has a deposit for this listing
+     
       const existingDeposit = await Deposit.findOne({ listingId, userId });
       if (existingDeposit) {
         return res.status(409).json({ 
@@ -116,7 +116,7 @@ router.post(
         });
       }
 
-      // Create new deposit
+     
       const deposit = new Deposit({
         listingId,
         userId,
@@ -126,7 +126,7 @@ router.post(
 
       await deposit.save();
 
-      // Populate references for response
+     
       await deposit.populate('listingId', 'brand carModel year price');
       await deposit.populate('userId', 'name email');
 
@@ -231,7 +231,7 @@ router.get('/:listingId', auth, async (req: Request, res: Response) => {
  */
 router.get('/admin/all', auth, async (req: Request, res: Response) => {
   try {
-    // Check if user is admin
+   
     const user = (req as any).user;
     if (user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied' });
@@ -265,7 +265,7 @@ router.get('/owner/cars', auth, async (req: Request, res: Response) => {
   try {
     const userId = (req as any).user._id;
 
-    // First, get all cars owned by the user
+   
     const userCars = await Car.find({ seller: userId }).select('_id');
     const carIds = userCars.map(car => car._id);
 
@@ -273,7 +273,7 @@ router.get('/owner/cars', auth, async (req: Request, res: Response) => {
       return res.json([]);
     }
 
-    // Get all deposits for these cars
+   
     const deposits = await Deposit.find({ listingId: { $in: carIds } })
       .populate('listingId', 'brand carModel year price images')
       .populate('userId', 'name email')
@@ -332,18 +332,18 @@ router.put('/:depositId/approve', auth, async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Deposit not found' });
     }
 
-    // Check if the current user is the owner of the car
+   
     const listingId = deposit.listingId as any;
     if (listingId.seller.toString() !== userId.toString()) {
       return res.status(403).json({ message: 'Access denied - you are not the owner of this car' });
     }
 
-    // Check if deposit is pending
+   
     if (deposit.status !== 'pending') {
       return res.status(400).json({ message: 'Deposit is not pending for approval' });
     }
 
-    // Update deposit status
+   
     deposit.status = 'approved';
     if (notes) {
       deposit.notes = notes;
@@ -351,7 +351,7 @@ router.put('/:depositId/approve', auth, async (req: Request, res: Response) => {
 
     await deposit.save();
 
-    // Update car status to reserved
+   
     await Car.findByIdAndUpdate(listingId._id, { status: 'reserved' });
 
     res.json({
@@ -410,18 +410,18 @@ router.put('/:depositId/reject', auth, async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Deposit not found' });
     }
 
-    // Check if the current user is the owner of the car
+   
     const listingId = deposit.listingId as any;
     if (listingId.seller.toString() !== userId.toString()) {
       return res.status(403).json({ message: 'Access denied - you are not the owner of this car' });
     }
 
-    // Check if deposit is pending
+   
     if (deposit.status !== 'pending') {
       return res.status(400).json({ message: 'Deposit is not pending for approval' });
     }
 
-    // Update deposit status
+   
     deposit.status = 'rejected';
     if (notes) {
       deposit.notes = notes;
@@ -479,7 +479,7 @@ router.put('/:depositId', auth, async (req: Request, res: Response) => {
     const { depositId } = req.params;
     const { status, notes } = req.body;
 
-    // Check if user is admin
+   
     const user = (req as any).user;
     if (user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied' });
@@ -497,7 +497,7 @@ router.put('/:depositId', auth, async (req: Request, res: Response) => {
 
     await deposit.save();
 
-    // Populate references for response
+   
     await deposit.populate('listingId', 'brand carModel year price');
     await deposit.populate('userId', 'name email');
 

@@ -8,7 +8,7 @@ export interface ISale extends Document {
   totalAmount: number;
   downPayment?: number;
   monthlyPayment?: number;
-  leaseTerm?: number; // in months
+  leaseTerm?: number;
   interestRate?: number;
   status: 'pending' | 'completed' | 'cancelled';
   saleDate: Date;
@@ -54,7 +54,7 @@ const SaleSchema = new Schema<ISale>({
   leaseTerm: {
     type: Number,
     min: 1,
-    max: 120, // 10 years max
+    max: 120,
   },
   interestRate: {
     type: Number,
@@ -78,7 +78,7 @@ const SaleSchema = new Schema<ISale>({
   timestamps: true,
 });
 
-// Index for better query performance
+
 SaleSchema.index({ carId: 1, buyerId: 1 });
 SaleSchema.index({ sellerId: 1 });
 SaleSchema.index({ status: 1 });

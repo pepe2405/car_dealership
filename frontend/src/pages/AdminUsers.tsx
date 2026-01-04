@@ -3,7 +3,7 @@ import { UserProfile } from '../services/userService';
 import authService from '../services/authService';
 import { getAllUsers, updateUser, deleteUser } from '../services/adminService';
 
-// Define the MongoDB document type
+
 interface MongoUser {
   _id: string;
   email: string;
@@ -38,7 +38,7 @@ const AdminUsers = () => {
       console.log('Fetching users with token:', token);
       const data = await getAllUsers(token);
       console.log('Received users data:', data);
-      // Transform MongoDB documents to match our interface
+     
       const validUsers = (data as unknown as MongoUser[]).map(user => ({
         id: user._id.toString(),
         email: user.email,

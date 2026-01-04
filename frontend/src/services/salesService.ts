@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-// Use relative URL to work with Vite proxy
+
 const API_URL = '/api/sales';
 
-// Configure axios defaults
+
 axios.defaults.withCredentials = true;
 
-// Create axios instance with default config
+
 const api = axios.create({
   withCredentials: true,
   headers: {

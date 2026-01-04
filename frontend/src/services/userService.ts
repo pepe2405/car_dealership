@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = '/api';
 
-// Configure axios defaults
+
 axios.defaults.withCredentials = true;
 
 export interface UserProfile {

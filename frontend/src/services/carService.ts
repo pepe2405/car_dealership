@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-// Use relative URL to work with Vite proxy
+
 const API_URL = '/api/cars';
 
-// Configure axios defaults
+
 axios.defaults.withCredentials = true;
 
-// Create axios instance with default config
+
 const api = axios.create({
   withCredentials: true,
   headers: {
@@ -39,13 +39,13 @@ export interface Car {
 
 export async function fetchCars(token?: string): Promise<Car[]> {
   if (token) {
-    // Use authenticated endpoint for logged in users
+   
     const response = await api.get(`${API_URL}/authenticated`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   } else {
-    // Use regular endpoint for unauthenticated users
+   
     const response = await api.get(API_URL);
     return response.data;
   }

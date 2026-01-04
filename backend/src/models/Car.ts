@@ -103,7 +103,7 @@ const carSchema = new Schema<ICar>(
   }
 );
 
-// Indexes for better query performance
+
 carSchema.index({ brand: 1, carModel: 1 });
 carSchema.index({ price: 1 });
 carSchema.index({ year: 1 });

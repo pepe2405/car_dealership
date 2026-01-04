@@ -55,7 +55,7 @@ const DepositModal = ({ isOpen, onClose, carId, carPrice, onDepositCreated }: De
       setAmount('');
       setNotes('');
       
-      // Close modal after 2 seconds
+     
       setTimeout(() => {
         onDepositCreated();
         onClose();

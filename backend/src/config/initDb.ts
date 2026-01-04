@@ -4,11 +4,11 @@ import { Car } from '../models/Car';
 
 export const initializeDatabase = async (): Promise<void> => {
   try {
-    // Create indexes
+   
     await User.createIndexes();
     await Car.createIndexes();
 
-    // Check if admin user exists
+   
     const adminExists = await User.findOne({ role: 'admin' });
     let adminUser; 
 

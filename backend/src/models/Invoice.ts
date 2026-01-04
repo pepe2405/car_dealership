@@ -145,7 +145,7 @@ const InvoiceSchema = new Schema<IInvoice>({
   timestamps: true,
 });
 
-// Generate invoice number
+
 InvoiceSchema.pre('save', async function(next) {
   if (this.isNew && !this.invoiceNumber) {
     const count = await mongoose.model('Invoice').countDocuments();
@@ -154,7 +154,7 @@ InvoiceSchema.pre('save', async function(next) {
   next();
 });
 
-// Index for better query performance
+
 InvoiceSchema.index({ saleId: 1 });
 InvoiceSchema.index({ invoiceNumber: 1 });
 InvoiceSchema.index({ status: 1 });

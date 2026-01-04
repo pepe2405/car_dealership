@@ -53,7 +53,7 @@ const OwnerDeposits = () => {
         await rejectDeposit(selectedDeposit._id, data, token!);
       }
 
-      await loadDeposits(); // Reload to get updated data
+      await loadDeposits();
       setShowNotesModal(false);
       setSelectedDeposit(null);
       setActionType(null);

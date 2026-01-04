@@ -45,7 +45,7 @@ const router = express.Router();
  *           $ref: '#/components/schemas/User'
  */
 
-// Register new user
+
 router.post(
   '/register',
   [
@@ -66,14 +66,14 @@ router.post(
 
       const { email, password, name, role, phone, address } = req.body;
 
-      // Check if user already exists
+     
       let user = await User.findOne({ email });
       if (user) {
         res.status(400).json({ message: 'User already exists' });
         return;
       }
 
-      // Create new user
+     
       user = new User({
         email,
         password,
@@ -85,7 +85,7 @@ router.post(
 
       await user.save();
 
-      // Generate JWT token
+     
       const token = jwt.sign(
         { _id: user._id },
         process.env.JWT_SECRET || 'your_jwt_secret_key_here',
@@ -150,7 +150,7 @@ router.post(
  *         description: Validation error
  */
 
-// Login user
+
 router.post(
   '/login',
   [
@@ -167,21 +167,21 @@ router.post(
 
       const { email, password } = req.body;
 
-      // Check if user exists
+     
       const user = await User.findOne({ email });
       if (!user) {
         res.status(400).json({ message: 'Invalid credentials' });
         return;
       }
 
-      // Check password
+     
       const isMatch = await user.comparePassword(password);
       if (!isMatch) {
         res.status(400).json({ message: 'Invalid credentials' });
         return;
       }
 
-      // Generate JWT token
+     
       const token = jwt.sign(
         { _id: user._id },
         process.env.JWT_SECRET || 'your_jwt_secret_key_here',
@@ -235,7 +235,7 @@ router.post(
  *         description: Invalid credentials
  */
 
-// Get current user
+
 router.get('/me', auth, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const user = await User.findById((req as any).user._id).select('-password');
@@ -265,8 +265,8 @@ router.get('/me', auth, async (req: Request, res: Response, next: NextFunction):
  *         description: Unauthorized
  */
 
-// --- FAVORITES ROUTES ---
-// Get all favorites for current user
+
+
 router.get('/favorites', auth, async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user._id).populate({
@@ -300,7 +300,7 @@ router.get('/favorites', auth, async (req: Request, res: Response) => {
  *         description: Unauthorized
  */
 
-// Add a car to favorites
+
 router.post('/favorites/:carId', auth, async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user._id);
@@ -342,7 +342,7 @@ router.post('/favorites/:carId', auth, async (req: Request, res: Response) => {
  *         description: Unauthorized
  */
 
-// Remove a car from favorites
+
 router.delete('/favorites/:carId', auth, async (req: Request, res: Response) => {
   try {
     const user = await User.findById((req as any).user._id);
@@ -378,7 +378,7 @@ router.delete('/favorites/:carId', auth, async (req: Request, res: Response) => 
  *         description: Unauthorized
  */
 
-// Change password
+
 router.post(
   '/change-password',
   auth,
@@ -402,13 +402,13 @@ router.post(
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Verify current password
+     
       const isMatch = await user.comparePassword(currentPassword);
       if (!isMatch) {
         return res.status(400).json({ message: 'Current password is incorrect' });
       }
 
-      // Update password
+     
       user.password = newPassword;
       await user.save();
 
@@ -453,7 +453,7 @@ router.post(
  *         description: User not found
  */
 
-// Update user profile
+
 router.put(
   '/profile',
   auth,
@@ -476,14 +476,14 @@ router.put(
         return res.status(404).json({ message: 'User not found' });
       }
 
-      // Update only the fields that are provided
+     
       if (name !== undefined) user.name = name;
       if (phone !== undefined) user.phone = phone;
       if (address !== undefined) user.address = address;
 
       await user.save();
 
-      // Return updated user without password
+     
       const updatedUser = {
         id: user._id,
         email: user.email,

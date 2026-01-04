@@ -4,7 +4,7 @@ import { auth } from '../middleware/auth';
 
 const router = express.Router();
 
-// GET all forums
+
 router.get('/', async (req, res) => {
   const forums = await Forum.find()
     .populate('owner', 'name email')
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   res.json(forums);
 });
 
-// GET single forum by ID
+
 router.get('/:id', async (req, res) => {
   try {
     const forum = await Forum.findById(req.params.id)
@@ -29,7 +29,7 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// CREATE forum
+
 router.post('/', auth, async (req: any, res) => {
   const { title, description } = req.body;
   const forum = new Forum({ title, description, owner: req.user._id });
@@ -38,7 +38,7 @@ router.post('/', auth, async (req: any, res) => {
   res.status(201).json(forum);
 });
 
-// DELETE forum (owner or admin)
+
 router.delete('/:id', auth, async (req: any, res) => {
   const forum = await Forum.findById(req.params.id);
   if (!forum) return res.status(404).json({ error: 'Not found' });
@@ -49,7 +49,7 @@ router.delete('/:id', auth, async (req: any, res) => {
   res.json({ success: true });
 });
 
-// ADD comment
+
 router.post('/:id/comments', auth, async (req: any, res) => {
   const forum = await Forum.findById(req.params.id);
   if (!forum) return res.status(404).json({ error: 'Not found' });
@@ -60,11 +60,11 @@ router.post('/:id/comments', auth, async (req: any, res) => {
   res.status(201).json(forum.comments[forum.comments.length - 1]);
 });
 
-// DELETE comment (author or admin)
+
 router.delete('/:forumId/comments/:commentId', auth, async (req: any, res) => {
   const forum = await Forum.findById(req.params.forumId).populate('comments.author', 'name email');
   if (!forum) return res.status(404).json({ error: 'Not found' });
-  // @ts-ignore: Mongoose subdocument array supports .id()
+  // @ts-ignore: Mongoose subdocument array supports .id() 
   const comment = forum.comments.id(req.params.commentId);
   if (!comment) return res.status(404).json({ error: 'Not found' });
   if (comment.author._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {

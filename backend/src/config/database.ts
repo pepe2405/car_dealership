@@ -3,12 +3,12 @@ import path from 'path';
 import mongoose from 'mongoose';
 import { initializeDatabase } from './initDb';
 
-// Load environment variables from .env file
+
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 export const connectDB = async (): Promise<void> => {
   try {
-    // Use local MongoDB connection string
+   
     const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/car_dealership';
     
     console.log('Attempting to connect to local MongoDB...');
@@ -28,7 +28,7 @@ export const connectDB = async (): Promise<void> => {
   }
 };
 
-// Handle connection events
+
 mongoose.connection.on('error', (err) => {
   console.error('MongoDB connection error:', err);
 });
@@ -37,7 +37,7 @@ mongoose.connection.on('disconnected', () => {
   console.log('MongoDB disconnected');
 });
 
-// Handle process termination
+
 process.on('SIGINT', async () => {
   try {
     await mongoose.connection.close();

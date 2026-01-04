@@ -22,7 +22,7 @@ const CarDetails = () => {
   const [favError, setFavError] = useState('');
   const currentUser = authService.getCurrentUser();
   const isSeller = currentUser?.role === 'seller' || currentUser?.role === 'admin';
-  const isBuyer = currentUser?.role === 'buyer' || !currentUser?.role; // Default role is buyer
+  const isBuyer = currentUser?.role === 'buyer' || !currentUser?.role;
   const [showTestDriveModal, setShowTestDriveModal] = useState(false);
   const [testDriveDate, setTestDriveDate] = useState('');
   const [testDriveMsg, setTestDriveMsg] = useState('');
@@ -30,17 +30,17 @@ const CarDetails = () => {
   const [testDriveSuccess, setTestDriveSuccess] = useState('');
   const [myTestDrive, setMyTestDrive] = useState<any>(null);
   
-  // Deposit related state
+ 
   const [depositStatus, setDepositStatus] = useState<DepositStatusResponse | null>(null);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [depositLoading, setDepositLoading] = useState(false);
   const isFetchingDeposit = useRef(false);
   const isFetchingTestDrive = useRef(false);
 
-  // Direct sale related state
+ 
   const [showDirectSaleModal, setShowDirectSaleModal] = useState(false);
 
-  // Purchase related state
+ 
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const CarDetails = () => {
           err.response?.data?.message || 
           'Failed to load car details. Please try again later.'
         );
-        // Redirect to cars page if car not found
+       
         if (err.response?.status === 404) {
           navigate('/cars');
         }
@@ -91,7 +91,7 @@ const CarDetails = () => {
       const token = authService.getToken();
       if (!token) return;
       
-      // Don't fetch if we're already fetching
+     
       if (isFetchingTestDrive.current) return;
       
       try {
@@ -100,8 +100,8 @@ const CarDetails = () => {
         setMyTestDrive(req);
       } catch (err: any) {
         console.error('Error fetching test drive request:', err);
-        // Don't set myTestDrive to null on error to avoid infinite loops
-        // Only set to null if it's a 404 (no test drive found)
+       
+       
         if (err.response?.status === 404) {
           setMyTestDrive(null);
         }
@@ -110,16 +110,16 @@ const CarDetails = () => {
       }
     };
     fetchMyTestDrive();
-  }, [car?._id, currentUser?.id]); // Use specific IDs instead of objects
+  }, [car?._id, currentUser?.id]);
 
-  // Fetch deposit status
+ 
   useEffect(() => {
     const fetchDepositStatus = async () => {
       if (!car || !currentUser) return;
       const token = authService.getToken();
       if (!token) return;
       
-      // Don't fetch if we're already fetching
+     
       if (isFetchingDeposit.current) return;
       
       try {
@@ -129,8 +129,8 @@ const CarDetails = () => {
         setDepositStatus(status);
       } catch (err: any) {
         console.error('Error fetching deposit status:', err);
-        // Only set hasDeposit: false if it's a 404 error (no deposit found)
-        // For other errors, don't change the state to avoid infinite loops
+       
+       
         if (err.response?.status === 404) {
           setDepositStatus({ hasDeposit: false });
         }
@@ -140,7 +140,7 @@ const CarDetails = () => {
       }
     };
     fetchDepositStatus();
-  }, [car?._id, currentUser?.id]); // Use specific IDs instead of objects
+  }, [car?._id, currentUser?.id]);
 
   const handleFavorite = async (carId: string) => {
     if (!currentUser) {
@@ -194,7 +194,7 @@ const CarDetails = () => {
   };
 
   const handleDepositCreated = () => {
-    // Refresh deposit status after creating a deposit
+   
     if (car && currentUser) {
       const token = authService.getToken();
       if (token) {
@@ -202,7 +202,7 @@ const CarDetails = () => {
           .then(setDepositStatus)
           .catch((err: any) => {
             console.error('Error refreshing deposit status:', err);
-            // Only update if it's a 404 (no deposit found)
+           
             if (err.response?.status === 404) {
               setDepositStatus({ hasDeposit: false });
             }
@@ -212,12 +212,12 @@ const CarDetails = () => {
   };
 
   const handleSaleCreated = () => {
-    // Redirect to profile page after successful sale
+   
     navigate('/profile');
   };
 
   const handlePurchaseCreated = () => {
-    // Redirect to profile page after successful purchase
+   
     navigate('/profile');
   };
 

@@ -13,7 +13,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   
-  // Profile editing state
+ 
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [form, setForm] = useState<Partial<UserProfile>>({});
   const [passwordForm, setPasswordForm] = useState({
@@ -45,9 +45,9 @@ const Profile = () => {
         throw new Error('Не сте влезни в профила си.');
       }
 
-      // Load sales and deposits in parallel
+     
       const [salesData, depositsData] = await Promise.all([
-        fetchSales(token).catch(() => []), // Catch error if user doesn't have access
+        fetchSales(token).catch(() => []),
         fetchUserDeposits(token).catch(() => [])
       ]);
 

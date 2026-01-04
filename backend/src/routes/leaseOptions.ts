@@ -4,7 +4,7 @@ import { auth, checkRole } from '../middleware/auth';
 
 const router = express.Router();
 
-// GET all active lease options
+
 router.get('/', async (req, res) => {
   try {
     const leaseOptions = await LeaseOption.find({ isActive: true }).sort({ duration: 1 });
@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET single lease option by ID
+
 router.get('/:id', async (req, res) => {
   try {
     const leaseOption = await LeaseOption.findById(req.params.id);
@@ -27,12 +27,12 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// CREATE new lease option (admin only)
+
 router.post('/', auth, checkRole(['admin']), async (req: any, res) => {
   try {
     const { name, duration, downPayment, interestRate } = req.body;
 
-    // Validation
+   
     if (!name || !duration || downPayment === undefined || !interestRate) {
       return res.status(400).json({ error: 'All fields are required' });
     }
@@ -49,7 +49,7 @@ router.post('/', auth, checkRole(['admin']), async (req: any, res) => {
       return res.status(400).json({ error: 'Interest rate must be between 0 and 100%' });
     }
 
-    // Check if name already exists
+   
     const existingOption = await LeaseOption.findOne({ name });
     if (existingOption) {
       return res.status(400).json({ error: 'Lease option with this name already exists' });
@@ -69,7 +69,7 @@ router.post('/', auth, checkRole(['admin']), async (req: any, res) => {
   }
 });
 
-// UPDATE lease option (admin only)
+
 router.put('/:id', auth, checkRole(['admin']), async (req: any, res) => {
   try {
     const { name, duration, downPayment, interestRate, isActive } = req.body;
@@ -79,7 +79,7 @@ router.put('/:id', auth, checkRole(['admin']), async (req: any, res) => {
       return res.status(404).json({ error: 'Lease option not found' });
     }
 
-    // Validation
+   
     if (duration && (duration < 1 || duration > 60)) {
       return res.status(400).json({ error: 'Duration must be between 1 and 60 months' });
     }
@@ -92,7 +92,7 @@ router.put('/:id', auth, checkRole(['admin']), async (req: any, res) => {
       return res.status(400).json({ error: 'Interest rate must be between 0 and 100%' });
     }
 
-    // Check if name already exists (if changing name)
+   
     if (name && name !== leaseOption.name) {
       const existingOption = await LeaseOption.findOne({ name });
       if (existingOption) {
@@ -100,7 +100,7 @@ router.put('/:id', auth, checkRole(['admin']), async (req: any, res) => {
       }
     }
 
-    // Update fields
+   
     if (name) leaseOption.name = name;
     if (duration) leaseOption.duration = duration;
     if (downPayment !== undefined) leaseOption.downPayment = downPayment;
@@ -114,7 +114,7 @@ router.put('/:id', auth, checkRole(['admin']), async (req: any, res) => {
   }
 });
 
-// DELETE lease option (admin only)
+
 router.delete('/:id', auth, checkRole(['admin']), async (req: any, res) => {
   try {
     const leaseOption = await LeaseOption.findById(req.params.id);

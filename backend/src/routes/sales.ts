@@ -94,7 +94,7 @@ router.post('/', auth, [
       notes,
     } = req.body;
 
-    // Check if car exists and is available
+   
     const car = await Car.findById(carId);
     if (!car) {
       return res.status(404).json({ message: 'Car not found' });
@@ -104,13 +104,13 @@ router.post('/', auth, [
       return res.status(400).json({ message: 'Car is not available for sale' });
     }
 
-    // Check if buyer exists
+   
     const buyer = await User.findById(buyerId);
     if (!buyer) {
       return res.status(404).json({ message: 'Buyer not found' });
     }
 
-    // Validate leasing parameters
+   
     if (saleType === 'leasing') {
       if (!downPayment || !monthlyPayment || !leaseTerm) {
         return res.status(400).json({ 
@@ -119,7 +119,7 @@ router.post('/', auth, [
       }
     }
 
-    // Create sale
+   
     const sale = new Sale({
       carId,
       buyerId,
@@ -135,10 +135,10 @@ router.post('/', auth, [
 
     await sale.save();
 
-    // Update car status to sold
+   
     await Car.findByIdAndUpdate(carId, { status: 'sold' });
 
-    // Populate references for response
+   
     await sale.populate([
       { path: 'carId', select: 'brand carModel year price images' },
       { path: 'buyerId', select: 'name email' },
@@ -173,7 +173,7 @@ router.get('/', auth, async (req: Request, res: Response) => {
   try {
     const user = (req as any).user;
     
-    // Only admins and sellers can view all sales
+   
     if (user.role !== 'admin' && user.role !== 'seller') {
       return res.status(403).json({ message: 'Access denied' });
     }
@@ -239,7 +239,7 @@ router.post('/:saleId/invoice', auth, [
     const user = (req as any).user;
     const { saleId } = req.params;
 
-    // Check if sale exists
+   
     const sale = await Sale.findById(saleId)
       .populate('carId', 'brand carModel year price')
       .populate('buyerId', 'name email')
@@ -249,12 +249,12 @@ router.post('/:saleId/invoice', auth, [
       return res.status(404).json({ message: 'Sale not found' });
     }
 
-    // Only the seller or admin can generate invoice
+   
     if (sale.sellerId.toString() !== user._id.toString() && user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Check if invoice already exists
+   
     const existingInvoice = await Invoice.findOne({ saleId });
     if (existingInvoice) {
       return res.status(400).json({ message: 'Invoice already exists for this sale' });
@@ -273,7 +273,7 @@ router.post('/:saleId/invoice', auth, [
       notes,
     } = req.body;
 
-    // Create invoice
+   
     const invoice = new Invoice({
       saleId,
       buyerInfo,
@@ -326,7 +326,7 @@ router.get('/:saleId/invoice', auth, async (req: Request, res: Response) => {
     const user = (req as any).user;
     const { saleId } = req.params;
 
-    // Check if sale exists
+   
     const sale = await Sale.findById(saleId)
       .populate('carId', 'brand carModel year price')
       .populate('buyerId', 'name email')
@@ -336,7 +336,7 @@ router.get('/:saleId/invoice', auth, async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Sale not found' });
     }
 
-    // Check access permissions
+   
     const isSeller = sale.sellerId.toString() === user._id.toString();
     const isBuyer = sale.buyerId.toString() === user._id.toString();
     const isAdmin = user.role === 'admin';
@@ -345,7 +345,7 @@ router.get('/:saleId/invoice', auth, async (req: Request, res: Response) => {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    // Get invoice
+   
     const invoice = await Invoice.findOne({ saleId });
     if (!invoice) {
       return res.status(404).json({ message: 'Invoice not found' });
