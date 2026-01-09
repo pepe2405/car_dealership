@@ -19,6 +19,7 @@ import leaseOptionsRoutes from "./routes/leaseOptions";
 import depositsRoutes from "./routes/deposits";
 import salesRoutes from "./routes/sales";
 import documentRoutes from "./routes/pdfGenerator";
+import exchangeRoutes from "./routes/exchange";
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/api/lease-options", leaseOptionsRoutes);
 app.use("/api/deposits", depositsRoutes);
 app.use("/api/sales", salesRoutes);
 app.use("/api", documentRoutes);
+app.use("/api/exchange", exchangeRoutes);
 
 const swaggerOptions = {
   definition: {

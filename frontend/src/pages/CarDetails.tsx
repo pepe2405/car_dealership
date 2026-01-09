@@ -21,6 +21,7 @@ import DepositModal from "../components/DepositModal";
 import DepositStatus from "../components/DepositStatus";
 import DirectSaleModal from "../components/DirectSaleModal";
 import PurchaseModal from "../components/PurchaseModal";
+import { fetchExchangeRates, ExchangeRates } from "../services/exchangeService";
 
 const CarDetails = () => {
   const { id } = useParams();
@@ -52,6 +53,8 @@ const CarDetails = () => {
   const [showDirectSaleModal, setShowDirectSaleModal] = useState(false);
 
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
+  const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
+  const [currency, setCurrency] = useState<"EUR" | "GBP" | "USD">("EUR");
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -121,6 +124,18 @@ const CarDetails = () => {
   }, [car?._id, currentUser?.id]);
 
   useEffect(() => {
+    const loadRates = async () => {
+      try {
+        const rates = await fetchExchangeRates();
+        setExchangeRates(rates);
+      } catch (err) {
+        console.error("Failed to fetch exchange rates:", err);
+      }
+    };
+    loadRates();
+  }, []);
+
+  useEffect(() => {
     const fetchDepositStatus = async () => {
       if (!car || !currentUser) return;
       const token = authService.getToken();
@@ -168,6 +183,20 @@ const CarDetails = () => {
       setFavError("");
     } catch (e) {
       setFavError("Грешка при добавяне/премахване от любими.");
+    }
+  };
+
+  const getConvertedPrice = (priceEUR: number) => {
+    if (!exchangeRates) return priceEUR.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    switch (currency) {
+      case "EUR":
+        return priceEUR.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      case "GBP":
+        return (priceEUR * exchangeRates.GBP).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      case "USD":
+        return (priceEUR * exchangeRates.USD).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      default:
+        return priceEUR.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
   };
 
@@ -362,9 +391,31 @@ const CarDetails = () => {
               <h1 className="text-3xl font-bold text-gray-900">
                 {car.brand} {car.carModel}
               </h1>
-              <p className="text-2xl font-semibold text-primary-600 mt-2">
-                ${car.price.toLocaleString()}
-              </p>
+              <div className="flex items-center gap-3 mt-2">
+              <span className="text-2xl font-semibold text-primary-600">
+                {getConvertedPrice(car.price)} {currency}
+              </span>
+              <div className="flex gap-1">
+                <button
+                  className={`px-2 py-1 rounded ${currency === "EUR" ? "bg-primary-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                  onClick={() => setCurrency("EUR")}
+                >
+                  EUR
+                </button>
+                <button
+                  className={`px-2 py-1 rounded ${currency === "GBP" ? "bg-primary-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                  onClick={() => setCurrency("GBP")}
+                >
+                  GBP
+                </button>
+                <button
+                  className={`px-2 py-1 rounded ${currency === "USD" ? "bg-primary-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                  onClick={() => setCurrency("USD")}
+                >
+                  USD
+                </button>
+              </div>
+            </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div>
