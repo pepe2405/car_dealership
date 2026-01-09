@@ -221,7 +221,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Обща сума ($)
+                  Обща сума (€)
                 </label>
                 <input
                   type="number"
@@ -237,7 +237,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Първоначална вноска ($)
+                      Първоначална вноска (€)
                     </label>
                     <input
                       type="number"
@@ -250,7 +250,7 @@ const PurchaseModal: React.FC<PurchaseModalProps> = ({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Месечна вноска ($)
+                      Месечна вноска (€)
                     </label>
                     <input
                       type="number"

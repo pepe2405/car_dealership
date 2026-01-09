@@ -31,7 +31,7 @@ start-pdf-service: pdf-venv
 	cd $(PDF_DIR) && ../$(PYTHON) -m uvicorn pdf_generator:app --host 0.0.0.0 --port 8001 --reload
 
 start-all:
-	concurrently "make start-backend" "make start-frontend" "make start-pdf-service"
+	npx concurrently "make start-backend" "make start-frontend" "make start-pdf-service"
 
 install:
 	npm install --prefix backend

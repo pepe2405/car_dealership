@@ -270,11 +270,11 @@ const Cars = () => {
             <div className="space-y-2">
               <label className="block text-sm font-medium text-primary-700 flex items-center gap-2">
                 <FaDollarSign className="text-primary-400" />
-                Min Price ($)
+                Min Price (€)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">
-                  $
+                  €
                 </span>
                 <input
                   type="number"
@@ -288,11 +288,11 @@ const Cars = () => {
             <div className="space-y-2">
               <label className="block text-sm font-medium text-primary-700 flex items-center gap-2">
                 <FaDollarSign className="text-primary-400" />
-                Max Price ($)
+                Max Price (€)
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary-400">
-                  $
+                  €
                 </span>
                 <input
                   type="number"
@@ -451,7 +451,7 @@ const Cars = () => {
                     </p>
                     <div className="mt-4 flex items-center justify-between">
                       <span className="text-2xl font-bold text-primary-600">
-                        ${car.price.toLocaleString()}
+                        €{car.price.toLocaleString()}
                       </span>
                       <Link
                         to={`/cars/${car._id}`}

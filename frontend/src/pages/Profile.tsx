@@ -645,7 +645,7 @@ const Profile = () => {
                               <div className="flex items-center gap-1">
                                 <FaDollarSign className="text-gray-400" />
                                 <span>
-                                  Месечно: $
+                                  Месечно: €
                                   {sale.monthlyPayment?.toLocaleString()}
                                 </span>
                               </div>
@@ -743,7 +743,7 @@ const Profile = () => {
                           <div className="flex items-center gap-1">
                             <FaDollarSign className="text-gray-400" />
                             <span>
-                              Цена на колата: $
+                              Цена на колата: €
                               {deposit.listingId.price.toLocaleString()}
                             </span>
                           </div>
