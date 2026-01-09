@@ -6,3 +6,4 @@ frontend/dist
 backend/dist
 .env
 pdf-service/venv/
+pdf-service/__pycache__/
