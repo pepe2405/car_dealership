@@ -19,7 +19,7 @@ start-frontend:
 
 pdf-venv:
 	@if [ ! -d "$(VENV)" ]; then \
-		echo "🔧 Creating Python virtual environment..."; \
+		echo "Creating Python virtual environment..."; \
 		python -m venv $(VENV); \
 		$(PIP) install --upgrade pip; \
 		$(PIP) install -r $(PDF_DIR)/requirements.txt; \
