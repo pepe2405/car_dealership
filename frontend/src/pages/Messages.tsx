@@ -6,7 +6,7 @@ import { getAllUsersForChat } from "../services/adminService";
 import { UserProfile } from "../services/userService";
 
 const API_URL = "/api";
-const SOCKET_URL = "http://localhost:5000";
+const SOCKET_URL = "http://localhost:5001";
 
 interface Message {
   _id: string;

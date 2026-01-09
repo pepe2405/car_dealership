@@ -135,7 +135,7 @@ const Sell = () => {
           country: trimmedForm.location.country,
         },
       };
-      await axios.post("http://localhost:5000/api/cars", carData, {
+      await axios.post("http://localhost:5001/api/cars", carData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

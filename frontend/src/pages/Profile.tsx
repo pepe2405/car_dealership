@@ -52,6 +52,41 @@ const Profile = () => {
     loadProfileData();
   }, []);
 
+  const generatePdf = async (sale: Sale) => {
+    try {
+      const token = authService.getToken();
+      if (!token) throw new Error("Не сте влезли в профила си");
+  
+      const response = await fetch("http://localhost:5001/api/generate-document", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          buyerName: sale.buyerId.name,
+          sellerName: user.name || "Н/А",
+          carModel: sale.carId.brand + " " + sale.carId.carModel,
+          carYear: sale.carId.year,
+          carPrice: sale.totalAmount,
+        }),
+      });
+  
+      if (!response.ok) throw new Error("Грешка при генериране на документа");
+  
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(new Blob([blob], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `car_document_${sale._id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err: any) {
+      alert(err.message || "Грешка при генериране на документа");
+    }
+  };  
+
   const loadUserData = async () => {
     try {
       const token = authService.getToken();
@@ -625,6 +660,15 @@ const Profile = () => {
                             </p>
                           </div>
                         )}
+
+                        <div className="mt-3 flex justify-end">
+                          <button
+                            onClick={() => generatePdf(sale)}
+                            className="btn-primary text-sm px-4 py-2"
+                          >
+                            Генерирай документ
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

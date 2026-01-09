@@ -18,6 +18,7 @@ import forumRoutes from "./routes/forum";
 import leaseOptionsRoutes from "./routes/leaseOptions";
 import depositsRoutes from "./routes/deposits";
 import salesRoutes from "./routes/sales";
+import documentRoutes from "./routes/pdfGenerator";
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use("/api/forums", forumRoutes);
 app.use("/api/lease-options", leaseOptionsRoutes);
 app.use("/api/deposits", depositsRoutes);
 app.use("/api/sales", salesRoutes);
+app.use("/api", documentRoutes);
 
 const swaggerOptions = {
   definition: {
@@ -67,7 +69,7 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "API documentation for the Car Dealership System",
     },
-    servers: [{ url: "http://localhost:5000/api" }],
+    servers: [{ url: "http://localhost:5001/api" }],
   },
   apis: ["./src/routes/*.ts"],
 };
@@ -93,7 +95,7 @@ app.use(
   },
 );
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
